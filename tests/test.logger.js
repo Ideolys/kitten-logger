@@ -1,9 +1,12 @@
 const should = require('should');
 const logger = require('../src/logger');
+const filter = require('../src/filter');
 
 describe('logger', () => {
 
   beforeEach(() =>  {
+    process.env.KITTEN_LOGGER = '*';
+    filter.filter();
     delete logger.loggers['test'];
   });
 
@@ -18,6 +21,7 @@ describe('logger', () => {
       should(_logger.info).be.a.Function();
       should(_logger.warn).be.a.Function();
       should(_logger.error).be.a.Function();
+      should(_logger.debug).be.a.Function();
       should(_logger.isEnabled).eql(true);
     });
 
@@ -30,6 +34,14 @@ describe('logger', () => {
       let _logger1 = logger.persistentLogger('test');
       let _logger2 = logger.persistentLogger('test');
       should(_logger1).eql(_logger2);
+    });
+
+    it('should be disabled', () => {
+      process.env.KITTEN_LOGGER = 'somethingelse';
+      filter.filter();
+
+      let _logger1 = logger.persistentLogger('test');
+      should(_logger1.isEnabled).eql(false);
     });
   });
 
@@ -44,12 +56,21 @@ describe('logger', () => {
       should(_logger.info).be.a.Function();
       should(_logger.warn).be.a.Function();
       should(_logger.error).be.a.Function();
-      should(_logger.isEnabled).eql(undefined);
+      should(_logger.debug).be.a.Function();
+      should(_logger.isEnabled).eql(true);
     });
 
     it('should have not added logger to saved loggers', () => {
       logger.logger('test');
       should(logger.loggers['test']).eql(undefined);
+    });
+
+    it('should be disabled', () => {
+      process.env.KITTEN_LOGGER = 'somethingelse';
+      filter.filter();
+
+      let _logger1 = logger.logger('test');
+      should(_logger1.isEnabled).eql(false);
     });
 
   });

@@ -2,7 +2,7 @@ const fs             = require('fs');
 const path           = require('path');
 const stream         = require('stream');
 const cluster        = require('cluster');
-const formatter      = require('./formatters');
+const logger         = require('./logger');
 const padlz          = require('./utils').padlz;
 const LOG_RETENTION  = 10;
 var currentDay       = '';
@@ -16,7 +16,10 @@ if (cluster.isWorker === true) {
   return;
 }
 
-const outTransform = createTransformStreamToAddLogInfo(process.pid);
+const masterLogger = logger.persistentLogger('master');
+const workerLogger = logger.persistentLogger('worker');
+
+const outTransform = createTransformStreamToAddLogInfo(masterLogger);
 
 if (!IS_ATTY) {
   process.stdout.write = outTransform.write.bind(outTransform);
@@ -48,8 +51,8 @@ if (!IS_ATTY) {
   }, 10000);
 }
 else {
-  let ttyTransformOut = _getTransform(process.pid, cluster.isWorker);
-  let ttyTransformErr = _getTransform(process.pid, cluster.isWorker, 'ERROR');
+  let ttyTransformOut = _getTransform(masterLogger);
+  let ttyTransformErr = _getTransform(masterLogger, 'ERROR');
 
   const originalStdoutWrite = process.stdout.write.bind(process.stdout);
   process.stdout.write      = (chunk, encoding, callback) => {
@@ -68,7 +71,7 @@ else {
 // Pipe each worker stdout/stderr to master stdout/stderr
 cluster.on('fork', function (worker) {
   // transform stdout/sterr directly from worker thread to print the right worker process.id
-  const _outTransformForWorker = createTransformStreamToAddLogInfo(worker.process.pid, true);
+  const _outTransformForWorker = createTransformStreamToAddLogInfo(workerLogger);
   worker.process.stdout.pipe(_outTransformForWorker);
   worker.process.stderr.pipe(_outTransformForWorker);
   _outTransformForWorker.pipe(process.stdout);
@@ -76,7 +79,13 @@ cluster.on('fork', function (worker) {
 });
 
 
-function _getTransform (pid, isWorker, defaultNamespace = 'DEBUG') {
+/**
+ * Get transform function
+ * @param {Object} defaultLogger persistent logger to format console.log messages
+ * @param {String} defaultType default logger type
+ * @returns {Function}
+ */
+function _getTransform (defaultLogger, defaultType = 'DEBUG') {
   return function transform (chunk, encoding, callback) {
     var _str = chunk.toString();
 
@@ -88,8 +97,8 @@ function _getTransform (pid, isWorker, defaultNamespace = 'DEBUG') {
       return callback(null, _str.slice(11));
     }
 
-    var _namespace = isWorker ? 'worker' : 'master';
-    callback(null, formatter.format(defaultNamespace, _namespace, pid, _str, null, isWorker));
+    let fn = defaultLogger[defaultType.toLowerCase()] || defaultLogger.debug;
+    callback(null, fn.call(null, _str));
   }
 }
 
@@ -99,9 +108,9 @@ function _getTransform (pid, isWorker, defaultNamespace = 'DEBUG') {
  * @param  {Boolean} isWorker true if the transform stream is generated for a worker.
  * @return {Function}         Transform stream function
  */
-function createTransformStreamToAddLogInfo (pid, isWorker) {
+function createTransformStreamToAddLogInfo (defaultLogger) {
   return new stream.Transform({
-    transform : _getTransform(pid, isWorker)
+    transform : _getTransform(defaultLogger)
   });
 }
 

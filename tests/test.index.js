@@ -8,6 +8,7 @@ describe('index', () => {
     should(index.createLogger).be.a.Function();
     should(index.createPersitentLogger).be.a.Function();
     should(index.init).be.a.Function();
+    should(index.filter).be.a.Function();
   });
 
 });
