@@ -1,7 +1,19 @@
 const tty           = require('tty');
 const padlz         = require('./utils').padlz;
+
 const IS_ATTY       = tty.isatty(process.stdout.fd);
 const CSV_SEPARATOR = '\t';
+const COLORS        = {
+  OFF     : '\x1b[0m',
+  CYAN    : '\x1b[36m',
+  WHITE   : '\x1b[37m',
+  RED     : '\x1b[91m',
+  YELLOW  : '\x1b[33m',
+  DIM     : '\x1b[2m',
+  BLACK   : '\x1b[30m',
+
+  BG_BLACK : '\x1b[40m'
+};
 
 let formatters = {};
 
@@ -15,6 +27,22 @@ function getCurrentTimestamp() {
     + padlz(_date.getSeconds()     , 2) + '.'
     + padlz(_date.getMilliseconds(), 3)
   ;
+}
+
+function getTime () {
+  var _date = new Date();
+  return padlz(_date.getHours()    , 2) + ':'
+    + padlz(_date.getMinutes()     , 2) + ':'
+    + padlz(_date.getSeconds()     , 2) + '.'
+    + padlz(_date.getMilliseconds(), 3)
+  ;
+}
+
+const colorsByLevel = {
+  DEBUG : '',
+  INFO  : COLORS.CYAN,
+  WARN  : COLORS.YELLOW,
+  ERROR : COLORS.RED
 }
 
 module.exports = {
@@ -42,8 +70,9 @@ module.exports = {
    * @param {Boolean} preventFormattingAgain
    */
   format (level, namespace, pid, msg, opt, preventFormattingAgain) {
-    let _out = [getCurrentTimestamp(), level, namespace];
-    let _msg = '';
+    let _out  = [];
+    let _time = '';
+    let _msg  = '';
 
     // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
     if (IS_ATTY === true && formatters[namespace] instanceof Function) {
@@ -56,18 +85,26 @@ module.exports = {
       _msg = JSON.stringify(msg, null, 2);
     }
 
-    if (IS_ATTY === false) {
-      // escape with simple quote, and add quote for CSV.
-      // As JSON uses double quote, we use simple quote for CSV to minimize replacements
-      _msg = "'" + _msg.replace(/'/g,"''") + "'";
-    }
-
     let _id = null;
     if (opt && opt.idKittenLogger) {
       _id = opt.idKittenLogger;
     }
 
-    _out.push(_msg.replace('\n', ''), pid, _id);
+    if (IS_ATTY === false) {
+      _time = getCurrentTimestamp();
+      // escape with simple quote, and add quote for CSV.
+      // As JSON uses double quote, we use simple quote for CSV to minimize replacements
+      _msg = "'" + _msg.replace(/'/g,"''").replace('\n', '') + "'";
+    }
+    else {
+      _time     = COLORS.DIM + getTime() + COLORS.OFF;
+      namespace = COLORS.BG_BLACK + COLORS.WHITE + ' ' + namespace + ' ' + COLORS.OFF;
+      level     = colorsByLevel[level] + level + COLORS.OFF;
+      pid       = COLORS.DIM + pid + COLORS.OFF;
+      _id       = _id ? COLORS.DIM + _id + COLORS.OFF : undefined;
+    }
+
+    _out.push(_time, level, namespace, _msg, pid, _id);
 
     return (preventFormattingAgain === true ? 'KITTEN_LOG%' : '') + _out.join(CSV_SEPARATOR) + '\n';
   }
