@@ -1,6 +1,12 @@
 const formatters = require('./formatters');
 let loggers      = {};
 
+/**
+ * Persistent logger
+ * Logger can be disabled with isEnabled property
+ * @param {String} namespace
+ * @returns {Function}
+ */
 function persistentLogger (namespace) {
   // If the logger is already created for this namespace, re-use it
   // Thus, if someone creates a logger in a loop, it will not leak!
@@ -21,5 +27,20 @@ function persistentLogger (namespace) {
   return _log;
 }
 
+/**
+ * Non persistent logger
+ * Logger cannot be disabled
+ * @param {String} namespace
+ * @retuns {Function}
+ */
+function logger (namespace) {
+  let _log   = (msq, opt) => { process.stdout.write( formatters.format('DEBUG', namespace, process.pid, msg, opt, true) )};
+  _log.info  = (msg, opt) => { process.stdout.write( formatters.format('INFO' , namespace, process.pid, msg, opt, true) )};
+  _log.error = (msg, opt) => { process.stdout.write( formatters.format('ERROR', namespace, process.pid, msg, opt, true) )};
+  _log.warn  = (msg, opt) => { process.stdout.write( formatters.format('WARN' , namespace, process.pid, msg, opt, true) )};
+  return _log;
+}
+
 exports.persistentLogger = persistentLogger;
+exports.logger           = logger;
 exports.loggers          = loggers;

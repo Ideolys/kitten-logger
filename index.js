@@ -6,6 +6,7 @@ process.env.DEBUG_HIDE_DATE = true;
 process.env.DEBUG_COLORS    = 0;
 
 module.exports = {
+  createLogger          : logger.logger,
   createPersitentLogger : logger.persistentLogger,
   addFormatter          : formatters.add,
   init                  : require('./src/init')
