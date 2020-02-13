@@ -1,4 +1,3 @@
-const scheduler  = require('./src/scheduler');
 const logger     = require('./src/logger');
 const formatters = require('./src/formatters');
 
@@ -7,6 +6,7 @@ process.env.DEBUG_HIDE_DATE = true;
 process.env.DEBUG_COLORS    = 0;
 
 module.exports = {
-  logger,
-  extend : formatters.extend
+  createPersitentLogger : logger.persistentLogger,
+  addFormatter          : formatters.add,
+  init                  : require('./src/init')
 };

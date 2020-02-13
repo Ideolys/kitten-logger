@@ -24,7 +24,7 @@ module.exports = {
    * @param {String} namespace
    * @param {Function} formatterFn
    */
-  extend (namespace, formatterFn) {
+  add (namespace, formatterFn) {
     if (typeof formatterFn !== 'function') {
       throw new Error('formatterFn is not a function');
     }
@@ -39,16 +39,15 @@ module.exports = {
    * @param {Int} pid
    * @param {Object/String} msg to format/log
    * @param {*} opt option to pass to formatter (ex: req)
-   * @param {Boolean} preventFormattingAgain*
-   * @param {String} version
+   * @param {Boolean} preventFormattingAgain
    */
-  format (level, namespace, pid, msg, opt, version, preventFormattingAgain) {
+  format (level, namespace, pid, msg, opt, preventFormattingAgain) {
     let _out = [getCurrentTimestamp(), level];
     let _msg = '';
 
     // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
     if (IS_ATTY === true && formatters[namespace] instanceof Function) {
-      _msg = formatters[namespace](msg, opt);
+      _msg = formatters[namespace](msg);
     }
     else if (typeof(msg) === 'string'){
       _msg = msg;
@@ -63,7 +62,7 @@ module.exports = {
       _msg = "'" + _msg.replace(/'/g,"''") + "'";
     }
 
-    _out.push(_msg, pid, namespace + '@' + version);
+    _out.push(_msg.replace('\n', ''), pid, namespace);
 
     return (preventFormattingAgain === true ? 'KITTEN_LOG%' : '') + _out.join(CSV_SEPARATOR) + '\n';
   }
