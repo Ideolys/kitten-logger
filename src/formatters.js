@@ -42,7 +42,7 @@ module.exports = {
    * @param {Boolean} preventFormattingAgain
    */
   format (level, namespace, pid, msg, opt, preventFormattingAgain) {
-    let _out = [getCurrentTimestamp(), level];
+    let _out = [getCurrentTimestamp(), level, namespace];
     let _msg = '';
 
     // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
@@ -62,7 +62,12 @@ module.exports = {
       _msg = "'" + _msg.replace(/'/g,"''") + "'";
     }
 
-    _out.push(_msg.replace('\n', ''), pid, namespace);
+    let _id = null;
+    if (opt && opt.idKittenLogger) {
+      _id = opt.idKittenLogger;
+    }
+
+    _out.push(_msg.replace('\n', ''), pid, _id);
 
     return (preventFormattingAgain === true ? 'KITTEN_LOG%' : '') + _out.join(CSV_SEPARATOR) + '\n';
   }
