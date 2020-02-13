@@ -1,6 +1,7 @@
-const should = require('should');
-const logger = require('../src/logger');
-const filter = require('../src/filter');
+const should    = require('should');
+const logger    = require('../src/logger');
+const filter    = require('../src/filter');
+const testUtils = require('./testUtils');
 
 describe('logger', () => {
 
@@ -22,6 +23,7 @@ describe('logger', () => {
       should(_logger.warn).be.a.Function();
       should(_logger.error).be.a.Function();
       should(_logger.debug).be.a.Function();
+      should(_logger.extend).be.a.Function();
       should(_logger.isEnabled).eql(true);
     });
 
@@ -43,6 +45,12 @@ describe('logger', () => {
       let _logger1 = logger.persistentLogger('test');
       should(_logger1.isEnabled).eql(false);
     });
+
+    it('should extend the logger', () => {
+      let _logger = logger.persistentLogger('test');
+      let _child  = _logger.extend('child');
+      should(logger.loggers['test:child']).be.a.Function();
+    });
   });
 
   describe('non persistent logger', () => {
@@ -57,6 +65,7 @@ describe('logger', () => {
       should(_logger.warn).be.a.Function();
       should(_logger.error).be.a.Function();
       should(_logger.debug).be.a.Function();
+      should(_logger.extend).be.a.Function();
       should(_logger.isEnabled).eql(true);
     });
 
@@ -71,6 +80,18 @@ describe('logger', () => {
 
       let _logger1 = logger.logger('test');
       should(_logger1.isEnabled).eql(false);
+    });
+
+    it('should extend the logger', done => {
+      let _logger = logger.persistentLogger('test');
+      let _child  = _logger.extend('child');
+
+      testUtils.replaceStdout((msg) => {
+        should(/test:child/.test(msg));
+        done();
+      });
+
+      _child.debug('A msg');
     });
 
   });
