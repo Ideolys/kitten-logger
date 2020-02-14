@@ -134,10 +134,10 @@ Define the variable `KITTEN_LOGGER`.
 process.env.KITTEN_LOGGER = 'onlyMyNamespace';
 ```
 
-### Programatic `kittenLogger.filter()`
+### Programatic `kittenLogger.filter({String} filter)`
 
 ```js
-kittenLogger.filter();
+kittenLogger.filter(filter);
 ```
 
 ### Receive actions from outside the process

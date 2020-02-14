@@ -10,8 +10,13 @@ module.exports = {
 
   /**
    * Filter namespaces
+   * @param {String} filter
    */
-  filter () {
+  filter (filter) {
+    if (filter) {
+      process.env.KITTEN_LOGGER = filter;
+    }
+
     exports.enables = [];
 
     let _filter  = process.env.KITTEN_LOGGER;
