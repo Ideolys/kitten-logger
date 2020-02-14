@@ -9,6 +9,9 @@ describe('index', () => {
     should(index.createPersitentLogger).be.a.Function();
     should(index.init).be.a.Function();
     should(index.filter).be.a.Function();
+    should(index.listen).be.a.Function();
+    should(index.connect).be.a.Function();
+    should(index.sendAction).be.a.Function();
   });
 
 });

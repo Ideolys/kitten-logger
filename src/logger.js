@@ -66,7 +66,17 @@ function logger (namespace) {
   return _log;
 }
 
+/**
+ * Enable persitent loggers
+ */
+function enable () {
+  for (let namespace in loggers) {
+    loggers[namespace].isEnabled = filter.isEnabled(namespace);
+  }
+}
+
 exports.persistentLogger = persistentLogger;
 exports.logger           = logger;
 exports.loggers          = loggers;
 exports.filter           = filter;
+exports.enable           = enable;

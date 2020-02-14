@@ -4,10 +4,11 @@ const stream         = require('stream');
 const cluster        = require('cluster');
 const logger         = require('./logger');
 const padlz          = require('./utils').padlz;
-const LOG_RETENTION  = 10;
+const LOG_RETENTION  = process.env.KITTEN_LOGGER_RETENTION_DAYS || 10;
 var currentDay       = '';
-const LOGS_DIRECTORY = 'logs';
-const outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, 'out.log');
+const LOGS_DIRECTORY = process.env.KITTEN_LOGGER_RETENTION_DIRECTORY || 'logs';
+const LOGS_FILE      = process.env.KITTEN_LOGGER_RETENTION_FILENAME  || 'out';
+const outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, LOGS_FILE + '.log');
 const tty            = require('tty');
 const IS_ATTY        = tty.isatty(process.stdout.fd);
 

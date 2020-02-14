@@ -1,6 +1,7 @@
 const logger     = require('./src/logger');
 const formatters = require('./src/formatters');
 const filter     = require('./src/filter');
+const socket     = require('./src/socket');
 
 // Remove timestamp and color from "debug" package
 process.env.DEBUG_HIDE_DATE = true;
@@ -18,5 +19,9 @@ module.exports = {
   createPersitentLogger : logger.persistentLogger,
   addFormatter          : formatters.add,
   init                  : require('./src/init'),
-  filter                : filter.filter
+  filter                : filter.filter,
+
+  listen     : socket.listen,
+  connect    : socket.connect,
+  sendAction : socket.send
 };
