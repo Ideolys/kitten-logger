@@ -46,7 +46,7 @@ The initialisation function create the `logs` directory where the process has be
 
 ### Loggers
 
-kitten-logger differenciates two types of loggers:
+kitten-logger differenciates two types of logger:
   - persitent logger
   - simple logger
 
@@ -87,10 +87,10 @@ logger.error(err);
 #### `LoggerObject`
 
 **Methods**
-+ `LoggerObject.debug({String/Object} msg, {Object} options)`: log given message with type `DEBUG`.
-+ `LoggerObject.info({String/Object} msg, {Object} options)`: log given message with type `INFO`.
-+ `LoggerObject.warn({String/Object} msg, {Object} options)`: log given message with type `WARN`.
-+ `LoggerObject.error({String/Object} msg, {Object} options)`: log given message with type `ERROR`.
++ `LoggerObject.debug({String/Object} msg, {Object} options)`: log given message with level `DEBUG`.
++ `LoggerObject.info({String/Object} msg, {Object} options)`: log given message with level `INFO`.
++ `LoggerObject.warn({String/Object} msg, {Object} options)`: log given message with level `WARN`.
++ `LoggerObject.error({String/Object} msg, {Object} options)`: log given message with level `ERROR`.
 + `LoggerObject.extend({String} namespace) -> {LoggerObject}`: extend the current logger, the namespace of the final LoggerObject will be the concatenation of the current one with the given parameter as `parentNamespace:childNamespace`.
 `options` is an Object, the key `isKittenLogger` can be set to follow logs through a chain of actions.
 
