@@ -4,13 +4,15 @@ const stream         = require('stream');
 const cluster        = require('cluster');
 const logger         = require('./logger');
 const padlz          = require('./utils').padlz;
+const tty            = require('tty');
+const zlib           = require('zlib');
+
 const LOG_RETENTION  = process.env.KITTEN_LOGGER_RETENTION_DAYS || 10;
-var currentDay       = '';
 const LOGS_DIRECTORY = process.env.KITTEN_LOGGER_RETENTION_DIRECTORY || 'logs';
 const LOGS_FILE      = process.env.KITTEN_LOGGER_RETENTION_FILENAME  || 'out';
 const outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, LOGS_FILE + '.log');
-const tty            = require('tty');
 const IS_ATTY        = tty.isatty(process.stdout.fd);
+var currentDay       = '';
 
 // do nothing if this file is called form a worker
 if (cluster.isWorker === true) {
@@ -147,6 +149,18 @@ function rotateLog (filename) {
     var _newFile = filename + '.' + i;
     try {
       fs.renameSync(_oldFile, _newFile);
+
+      let readStream  = fs.createReadStream(_newFile);
+      let writeStream = fs.createWriteStream(_newFile + '.gz', { flags : 'a', encoding : 'utf8',  mode : parseInt('0666',8) });
+      let gzip = zlib.createGzip();
+
+      readStream.pipe(gzip).pipe(writeStream).on('finish', (err) => {
+        if (err) {
+          return;
+        }
+
+        fs.unlink(_newFile, (err) => {});
+      });
     }
     catch (e) {} // eslint-disable-line
   }
