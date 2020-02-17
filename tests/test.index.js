@@ -12,6 +12,7 @@ describe('index', () => {
     should(index.listen).be.a.Function();
     should(index.connect).be.a.Function();
     should(index.sendAction).be.a.Function();
+    should(index.formattersCollection).be.an.Object();
   });
 
 });

@@ -3,17 +3,7 @@ const padlz         = require('./utils').padlz;
 
 const IS_ATTY       = tty.isatty(process.stdout.fd);
 const CSV_SEPARATOR = '\t';
-const COLORS        = {
-  OFF     : '\x1b[0m',
-  CYAN    : '\x1b[36m',
-  WHITE   : '\x1b[37m',
-  RED     : '\x1b[91m',
-  YELLOW  : '\x1b[33m',
-  DIM     : '\x1b[2m',
-  BLACK   : '\x1b[30m',
-
-  BG_BLACK : '\x1b[40m'
-};
+const COLORS        = require('../colors');
 
 let formatters = {};
 
@@ -43,7 +33,7 @@ const colorsByLevel = {
   INFO  : COLORS.CYAN,
   WARN  : COLORS.YELLOW,
   ERROR : COLORS.RED
-}
+};
 
 module.exports = {
 
