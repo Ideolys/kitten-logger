@@ -6,8 +6,8 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha ./tests/test*.js -w"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ideolys",
+  "license": "Apache-2.0",
   "devDependencies": {
     "mocha": "^7.0.1",
     "should": "^13.2.3"

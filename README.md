@@ -27,7 +27,7 @@ logger.info('My message to log');
 
 ## Philosophy
 
-A master process initializes kitten-logger (`kittenLogger.init`) to capture `stdout` and `stderr` from master process and forked processes if it is run in cluster mode. Then, it logs entries in log file in CSV format or directly in the terminal depending from which method the master process has been run.
+A master process initializes kitten-logger (`kittenLogger.init`) to capture `stdout` and `stderr` from master process and forked processes if it is run in cluster mode. Then, it logs entries in log file in CSV format or directly in the terminal.
 
 ## API
 
