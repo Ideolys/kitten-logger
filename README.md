@@ -122,6 +122,12 @@ kittenLogger.addFormatter('http', msg => {
 logger.log({ method : req.method, url : req.url });
 ```
 
+#### `kittenLogger.formattersCollection -> Object`
+
+Return a list of predefined formatters (`/lib`):
+  - `http_start`, log HTTP request
+  - `http_end`, log HTTP request's result
+
 ### Filter namespaces
 
 Kitten-logger allows you to filter namespaces at runtime.
