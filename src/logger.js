@@ -3,6 +3,26 @@ const filter     = require('./filter');
 let loggers      = {};
 
 /**
+ * Define logger functions
+ * @param {Object} logger
+ * @param {String} namespace
+ */
+function defineFns (logger, namespace) {
+  logger.info  = filter.isLevelEnabled('INFO')  ? LOG_LEVEL_FNS.info(logger , namespace) : LOG_LEVEL_FNS.disabled;
+  logger.error = filter.isLevelEnabled('ERROR') ? LOG_LEVEL_FNS.error(logger, namespace) : LOG_LEVEL_FNS.disabled;
+  logger.warn  = filter.isLevelEnabled('WARN')  ? LOG_LEVEL_FNS.warn(logger , namespace) : LOG_LEVEL_FNS.disabled;
+  logger.debug = filter.isLevelEnabled('DEBUG') ? LOG_LEVEL_FNS.debug(logger, namespace) : LOG_LEVEL_FNS.disabled;
+}
+
+const LOG_LEVEL_FNS = {
+  info     : function (logger, namespace, level = 'INFO' ) { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
+  debug    : function (logger, namespace, level = 'DEBUG') { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
+  warn     : function (logger, namespace, level = 'WARN' ) { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
+  error    : function (logger, namespace, level = 'ERROR') { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
+  disabled : function disabled () { return; }
+};
+
+/**
  * Persistent logger
  * Logger can be disabled with isEnabled property
  * @param {String} namespace
@@ -16,12 +36,11 @@ function persistentLogger (namespace) {
   }
 
   // create loggers, and exists as fast as possible if the log is disabled
-  let _log   = (msq, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('DEBUG', namespace, process.pid, msg, opt, true) )};
-  _log.info  = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('INFO' , namespace, process.pid, msg, opt, true) )};
-  _log.error = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('ERROR', namespace, process.pid, msg, opt, true) )};
-  _log.warn  = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('WARN' , namespace, process.pid, msg, opt, true) )};
-  _log.debug = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('DEBUG', namespace, process.pid, msg, opt, true) )};
-  _log.isEnabled = filter.isEnabled(namespace);
+  let _log = {
+    isEnabled : filter.isEnabled(namespace)
+  };
+
+  defineFns(_log, namespace);
 
   /**
    * Extend a logger
@@ -46,12 +65,11 @@ function persistentLogger (namespace) {
  * @retuns {Function}
  */
 function logger (namespace) {
-  let _log   = (msq, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('DEBUG', namespace, process.pid, msg, opt, true) )};
-  _log.info  = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('INFO' , namespace, process.pid, msg, opt, true) )};
-  _log.error = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('ERROR', namespace, process.pid, msg, opt, true) )};
-  _log.warn  = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('WARN' , namespace, process.pid, msg, opt, true) )};
-  _log.debug = (msg, opt) => { if (_log.isEnabled === false ) return; process.stdout.write( formatters.format('DEBUG', namespace, process.pid, msg, opt, true) )};
-  _log.isEnabled = filter.isEnabled(namespace);
+  let _log = {
+    isEnabled : filter.isEnabled(namespace)
+  };
+
+  defineFns(_log, namespace);
 
   /**
    * Extend a logger
@@ -75,8 +93,19 @@ function enable () {
   }
 }
 
+/**
+ * Enable persitent loggers levels
+ */
+function enableLevels () {
+  for (let namespace in loggers) {
+    let logger = loggers[namespace];
+    defineFns(logger, namespace);
+  }
+}
+
 exports.persistentLogger = persistentLogger;
 exports.logger           = logger;
 exports.loggers          = loggers;
 exports.filter           = filter;
 exports.enable           = enable;
+exports.enableLevels     = enableLevels;

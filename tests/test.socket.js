@@ -112,4 +112,88 @@ describe('socket', () => {
     });
   });
 
+  it('should receive filter_level action', done => {
+    should(process.env.KITTEN_LOGGER).eql('*');
+
+    socket.listen(c => {
+      socket.connect(client => {
+        socket.connect(client2 => {
+          socket.send({ action : 'FILTER_LEVEL', value : 'ERROR' });
+
+          setTimeout(() => {
+            should(process.env.KITTEN_LOGGER_LEVEL).eql('ERROR');
+            client2.destroy();
+            client.destroy();
+            c.close();
+            done();
+          }, 200);
+        });
+      });
+    });
+  });
+
+  it('should disable DEBUG & INFO functions', done => {
+    let _logger = logger.persistentLogger('sql');
+
+    socket.listen(c => {
+      socket.connect(client => {
+        socket.connect(client2 => {
+          socket.send({ action : 'FILTER_LEVEL', value : 'WARN' });
+
+          setTimeout(() => {
+            should(_logger.debug.name).eql('disabled');
+            should(_logger.info.name).eql('disabled');
+            client2.destroy();
+            client.destroy();
+            c.close();
+            done();
+          }, 200);
+        });
+      });
+    });
+  });
+
+  it('should disable DEBUG functions', done => {
+    process.env.KITTEN_LOGGER_LEVEL = 'INFO'
+    let _logger = logger.persistentLogger('sql');
+    should(_logger.debug.name).eql('disabled');
+
+    socket.listen(c => {
+      socket.connect(client => {
+        socket.connect(client2 => {
+          socket.send({ action : 'FILTER_LEVEL', value : 'DEBUG' });
+
+          setTimeout(() => {
+            should(_logger.debug.name).not.eql('disabled');
+            client2.destroy();
+            client.destroy();
+            c.close();
+            done();
+          }, 200);
+        });
+      });
+    });
+  });
+
+  it('should not disable DEBUG functions for non persistent logger', done => {
+    let _logger = logger.logger('sql');
+    should(_logger.debug.name).not.eql('disabled');
+
+    socket.listen(c => {
+      socket.connect(client => {
+        socket.connect(client2 => {
+          socket.send({ action : 'FILTER_LEVEL', value : 'INFO' });
+
+          setTimeout(() => {
+            should(_logger.debug.name).not.eql('disabled');
+            client2.destroy();
+            client.destroy();
+            c.close();
+            done();
+          }, 200);
+        });
+      });
+    });
+  });
+
 });

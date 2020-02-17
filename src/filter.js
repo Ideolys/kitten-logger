@@ -1,3 +1,10 @@
+const LOG_LEVELS = {
+  ERROR : 1,
+  WARN  : 2,
+  INFO  : 3,
+  DEBUG : 4
+};
+
 module.exports = {
   isEnabled (namespace) {
     for (let i = 0, len = exports.enables.length; i < len; i++) {
@@ -5,6 +12,17 @@ module.exports = {
         return true;
       }
     }
+    return false;
+  },
+
+  /**
+   * Is
+   */
+  isLevelEnabled (level) {
+    if (LOG_LEVELS[level] <= LOG_LEVELS[process.env.KITTEN_LOGGER_LEVEL]) {
+      return true;
+    }
+
     return false;
   },
 

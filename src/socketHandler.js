@@ -14,6 +14,11 @@ module.exports = (msg) => {
   if (msg.action === 'FILTER') {
     process.env.KITTEN_LOGGER = msg.value || '*';
     filter.filter();
-    loggers.enable();
+    return loggers.enable();
+  }
+
+  if (msg.action === 'FILTER_LEVEL') {
+    process.env.KITTEN_LOGGER_LEVEL = msg.value || 'DEBUG';
+    return loggers.enableLevels();
   }
 };
