@@ -31,11 +31,19 @@ A master process initializes kitten-logger (`kittenLogger.init`) to capture `std
 
 ## API
 
+### Log levels
+
+- `DEBUG`
+- `INFO`
+- `WARN`
+- `ERROR`
+
 ### Environment variables
 
 Variable                            | Description
 ------------------------------------|------------
 `KITTEN_LOGGER`                     | Enable namespaces, ex: `namespace:*`. It supports multi-filters with `,` as separator, ex: `namespace,otherNamespace`. By default, the variable searchs `DEBUG` variable. If no `DEBUG`variable has been found, the `*` is set.
+`KITTEN_LOGGER_LEVEL`               | Filter log level from specified level. Default is `DEBUG`. The hierarchy is `DEBUG` < `INFO` < `WARN` < `ERROR`.
 `KITTEN_LOGGER_RETENTION_DAYS`      | Set log retention days. By default is `10`;
 `KITTEN_LOGGER_RETENTION_DIRECTORY` | Directory to write to logs file. Default is `logs`.
 `KITTEN_LOGGER_RETENTION_FILENAME`  | Filename where to write logs. Default is `out`;
@@ -128,9 +136,9 @@ Return a list of predefined formatters (`/lib`):
   - `http_start`, log HTTP request
   - `http_end`, log HTTP request's result
 
-### Filter namespaces
+### Filter
 
-Kitten-logger allows you to filter namespaces at runtime.
+Kitten-logger allows you to filter namespaces & levels at runtime.
 
 ### Static
 
@@ -140,10 +148,24 @@ Define the variable `KITTEN_LOGGER`.
 process.env.KITTEN_LOGGER = 'onlyMyNamespace';
 ```
 
-### Programatic `kittenLogger.filter({String} filter)`
+Define the variable `KITTEN_LOGGER_LEVEL`.
 
 ```js
-kittenLogger.filter(filter);
+process.env.KITTEN_LOGGER_LEVEL = 'INFO';
+```
+
+### Programatic
+
+`kittenLogger.filter({String} filter)`
+
+```js
+kittenLogger.filter('onlyMyNamespace');
+```
+
+`kittenLogger.filterLevel({String} level)`
+
+```js
+kittenLogger.filterLevel('INFO');
 ```
 
 ### Receive actions from outside the process
@@ -162,7 +184,11 @@ The message must be of JSON type aand follow the given format :
 }
 ```
 Where `<ACTION>` is a string, and `<value>` is the value for the action.
-Only `FILTER` action is supported for now. It calls the mehod `kittenLogger.filter` for the clients connected to the socket server.
+
+Actions       | Description
+--------------|------------
+`FILTER`      | Call the mehod `kittenLogger.filter` for the clients connected to the socket server.
+`FILTER_LEVEL`| Call the mehod `kittenLogger.filterLevel` for the clients connected to the socket server.
 
 #### `kittenLogger.listen()`
 
