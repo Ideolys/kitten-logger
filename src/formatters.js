@@ -88,7 +88,7 @@ module.exports = {
     }
     else {
       _time     = COLORS.DIM + getTime() + COLORS.OFF;
-      namespace = COLORS.BG_BLACK + COLORS.WHITE + ' ' + namespace + ' ' + COLORS.OFF;
+      namespace = COLORS.DIM + namespace + COLORS.OFF;
       level     = colorsByLevel[level] + level + COLORS.OFF;
       pid       = COLORS.DIM + pid + COLORS.OFF;
       _id       = _id ? COLORS.DIM + _id + COLORS.OFF : undefined;
