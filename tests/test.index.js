@@ -6,7 +6,7 @@ describe('index', () => {
   it('should define public properties', () => {
     should(index.addFormatter).be.a.Function();
     should(index.createLogger).be.a.Function();
-    should(index.createPersitentLogger).be.a.Function();
+    should(index.createPersistentLogger).be.a.Function();
     should(index.init).be.a.Function();
     should(index.filter).be.a.Function();
     should(index.listen).be.a.Function();

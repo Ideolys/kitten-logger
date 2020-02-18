@@ -14,10 +14,10 @@ filter.filter();
 logger.enable();
 
 module.exports = {
-  createLogger          : logger.logger,
-  createPersitentLogger : logger.persistentLogger,
-  addFormatter          : formatters.add,
-  init                  : require('./src/init'),
+  createLogger           : logger.logger,
+  createPersistentLogger : logger.persistentLogger,
+  addFormatter           : formatters.add,
+  init                   : require('./src/init'),
   /**
    * Filter namespace
    * @param {String} filter
