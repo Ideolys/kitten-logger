@@ -72,7 +72,7 @@ module.exports = {
       _msg = msg;
     }
     else {
-      _msg = JSON.stringify(msg, null, 2);
+      _msg = JSON.stringify(msg, null, IS_ATTY === true ? 2 : null);
     }
 
     let _id = null;
