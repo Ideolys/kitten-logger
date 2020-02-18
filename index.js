@@ -20,10 +20,10 @@ module.exports = {
   init                   : require('./src/init'),
   /**
    * Filter namespace
-   * @param {String} filter
+   * @param {String} namespace
    */
-  filter : function (filter) {
-    filter.filter(filter);
+  filter : function (namespace) {
+    filter.filter(namespace);
     logger.enable();
   },
   /**
