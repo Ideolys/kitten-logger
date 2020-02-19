@@ -14,6 +14,8 @@ const outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, LOGS_FILE + '.lo
 const IS_ATTY        = tty.isatty(process.stdout.fd);
 var currentDay       = '';
 
+let currentRotationIterator = LOG_RETENTION;
+
 // do nothing if this file is called form a worker
 if (cluster.isWorker === true) {
   return;
@@ -47,9 +49,10 @@ if (!IS_ATTY) {
       currentDay = _day;
     }
     else if (currentDay !== _day) {
-      console.log('[kitten-logger] [master] Rotate logs');
-      outLogStream = rotateStream(outTransform, outLogStream, outFilename);
-      currentDay   = _day;
+      rotateStream(outTransform, outLogStream, outFilename, stream => {
+        outLogStream = stream;
+        currentDay = _day;
+      });
     }
   }, 10000);
 }
@@ -122,46 +125,61 @@ function createTransformStreamToAddLogInfo (defaultLogger) {
  * @param  {Stream} readableStream stream from which logs come from
  * @param  {Stream} writableStream current file stream where logs go to
  * @param  {String} filename       log filename
- * @return {Stream}                new file stream where logs go to
+ * @param  {Function} callback newStream: new file stream where logs go to
  */
-function rotateStream (readableStream, writableStream, filename) {
+function rotateStream (readableStream, writableStream, filename, callback) {
   readableStream.pause();
   readableStream.unpipe(writableStream);
   writableStream.end();
-  rotateLog(filename);
-  var _newWritableStream = fs.createWriteStream(filename, { flags : 'a', encoding : 'utf8',  mode : parseInt('0666',8) });
-  readableStream.pipe(_newWritableStream);
-  readableStream.resume();
-  return _newWritableStream;
+
+  currentRotationIterator = LOG_RETENTION;
+  rotateLog(filename, () => {
+    var _newWritableStream = fs.createWriteStream(filename, { flags : 'a', encoding : 'utf8',  mode : parseInt('0666',8) });
+    readableStream.pipe(_newWritableStream);
+    readableStream.resume();
+    callback(_newWritableStream);
+  });
 }
 
 /**
  * Rotate log file.
- * @Warning, this function is synchrone. But executed once a day, by the master process only, at midnight.
- * @param  {String} filename log file name
+ * @param {String} filename log file name
+ * @param {Function}
  */
-function rotateLog (filename) {
-  for (var i = LOG_RETENTION; i > 0 ; i--) {
-    var _oldFile = filename + '.' + (i-1);
-    if (i === 1) {
-      _oldFile = filename;
-    }
-    var _newFile = filename + '.' + i;
-    try {
-      fs.renameSync(_oldFile, _newFile);
-
-      let readStream  = fs.createReadStream(_newFile);
-      let writeStream = fs.createWriteStream(_newFile + '.gz', { flags : 'a', encoding : 'utf8',  mode : parseInt('0666',8) });
-      let gzip = zlib.createGzip();
-
-      readStream.pipe(gzip).pipe(writeStream).on('finish', (err) => {
-        if (err) {
-          return;
-        }
-
-        fs.unlink(_newFile, (err) => {});
-      });
-    }
-    catch (e) {} // eslint-disable-line
+function rotateLog (filename, callback) {
+  currentRotationIterator--;
+  if (currentRotationIterator <= 0) {
+    return callback();
   }
+
+  let _oldFile = filename + '.' + (currentRotationIterator - 1);
+  let _newFile = filename + '.' + currentRotationIterator;
+
+  if (currentRotationIterator === 1) {
+    _oldFile = filename;
+  }
+  else {
+    _oldFile += '.gz';
+    _newFile += '.gz';
+  }
+
+  fs.rename(_oldFile, _newFile, err => {
+    if (err || _oldFile !== filename) {
+      return rotateLog(filename, callback);
+    }
+
+    let readStream  = fs.createReadStream(_newFile);
+    let writeStream = fs.createWriteStream(_newFile + '.gz', { flags : 'a', encoding : 'utf8',  mode : parseInt('0666',8) });
+    let gzip = zlib.createGzip();
+
+    readStream.pipe(gzip).pipe(writeStream).on('finish', (err) => {
+      if (err) {
+        return rotateLog(filename, callback);
+      }
+
+      fs.unlink(_newFile, (err) => {
+        rotateLog(filename, callback);
+      });
+    });
+  });
 }
