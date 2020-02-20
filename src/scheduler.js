@@ -1,11 +1,11 @@
-const fs             = require('fs');
-const path           = require('path');
-const stream         = require('stream');
-const cluster        = require('cluster');
-const logger         = require('./logger');
-const padlz          = require('./utils').padlz;
-const tty            = require('tty');
-const zlib           = require('zlib');
+const fs        = require('fs');
+const path      = require('path');
+const stream    = require('stream');
+const cluster   = require('cluster');
+const padlz     = require('./utils').padlz;
+const tty       = require('tty');
+const zlib      = require('zlib');
+const formatter = require('./formatters');
 
 const LOG_RETENTION  = process.env.KITTEN_LOGGER_RETENTION_DAYS || 10;
 const LOGS_DIRECTORY = process.env.KITTEN_LOGGER_RETENTION_DIRECTORY || 'logs';
@@ -21,12 +21,9 @@ if (cluster.isWorker === true) {
   return;
 }
 
-const masterLogger = logger.persistentLogger('master');
-const workerLogger = logger.persistentLogger('worker');
-
-const outTransform = createTransformStreamToAddLogInfo(masterLogger);
-
 if (!IS_ATTY) {
+  const outTransform = createTransformStreamToAddLogInfo(process.pid);
+
   process.stdout.write = outTransform.write.bind(outTransform);
   process.stderr.write = outTransform.write.bind(outTransform);
 
@@ -37,7 +34,7 @@ if (!IS_ATTY) {
   catch (e) {} // eslint-disable-line
 
   // create log stream
-  var outLogStream = fs.createWriteStream(outFilename, { flags : 'a', encoding : 'utf8',  mode : parseInt('0666',8) });
+  var outLogStream = fs.createWriteStream(outFilename, { flags : 'a', encoding : 'utf8',  mode : parseInt('0666', 8) });
 
   outTransform.pipe(outLogStream);
 
@@ -57,54 +54,47 @@ if (!IS_ATTY) {
   }, 10000);
 }
 else {
-  let ttyTransformOut = _getTransform(masterLogger);
-  let ttyTransformErr = _getTransform(masterLogger, 'ERROR');
+  let ttyTransform = _getTransform(process.pid);
 
   const originalStdoutWrite = process.stdout.write.bind(process.stdout);
   process.stdout.write      = (chunk, encoding, callback) => {
-    ttyTransformOut(chunk, encoding, (err, data) => {
+    ttyTransform(chunk, encoding, (err, data) => {
       originalStdoutWrite(data, encoding, callback);
     }, process.pid);
   };
   const originalStderrWrite = process.stderr.write.bind(process.stderr);
   process.stderr.write      = (chunk, encoding, callback) => {
-    ttyTransformErr(chunk, encoding, (err, data) => {
+    ttyTransform(chunk, encoding, (err, data) => {
       originalStderrWrite(data, encoding, callback);
     });
   };
 }
 
 // Pipe each worker stdout/stderr to master stdout/stderr
-cluster.on('fork', function (worker) {
-  // transform stdout/sterr directly from worker thread to print the right worker process.id
-  const _outTransformForWorker = createTransformStreamToAddLogInfo(workerLogger);
-  worker.process.stdout.pipe(_outTransformForWorker);
-  worker.process.stderr.pipe(_outTransformForWorker);
-  _outTransformForWorker.pipe(process.stdout);
-  _outTransformForWorker.pipe(process.stderr);
-});
-
+  cluster.on('fork', function (worker) {
+    const outTransform = createTransformStreamToAddLogInfo(worker.process.pid, true);
+    worker.process.stdout.pipe(outTransform);
+    worker.process.stderr.pipe(outTransform);
+    outTransform.pipe(process.stdout);
+  });
 
 /**
  * Get transform function
- * @param {Object} defaultLogger persistent logger to format console.log messages
- * @param {String} defaultType default logger type
+ * @param {String} pid
+ * @param {Boolean} isWorker
  * @returns {Function}
  */
-function _getTransform (defaultLogger, defaultType = 'DEBUG') {
+function _getTransform (pid, isWorker) {
   return function transform (chunk, encoding, callback) {
-    var _str = chunk.toString();
+    let currentLog = chunk.toString();
+    let index      = currentLog.indexOf('KT_LOG%');
 
-    // if the log is already transformed, leave immediately
-    // Logs coming from workers or coming from ideos logger are already transformed, because the context cannot
-    // be found by the master process
-    // But log coming from everywhere (crash, console.log, debug module, etc) are not transformed
-    if (_str.startsWith('KITTEN_LOG%') === true) {
-      return callback(null, _str.slice(11));
+    if (index === -1) {
+      return callback(null, formatter.format('DEBUG', isWorker ? 'worker' : 'master', pid, currentLog, null, isWorker));
     }
 
-    let fn = defaultLogger[defaultType.toLowerCase()] || defaultLogger.debug;
-    callback(null, fn.call(null, _str));
+    // For workers, sometimes chunk is concatenation of multiple messages
+    return callback(null, isWorker ? currentLog : currentLog.replace(/KT_LOG%/g, ''))
   }
 }
 
@@ -114,9 +104,9 @@ function _getTransform (defaultLogger, defaultType = 'DEBUG') {
  * @param  {Boolean} isWorker true if the transform stream is generated for a worker.
  * @return {Function}         Transform stream function
  */
-function createTransformStreamToAddLogInfo (defaultLogger) {
+function createTransformStreamToAddLogInfo (pid, isWorker) {
   return new stream.Transform({
-    transform : _getTransform(defaultLogger)
+    transform : _getTransform(pid, isWorker)
   });
 }
 

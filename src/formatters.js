@@ -95,7 +95,6 @@ module.exports = {
     }
 
     _out.push(_time, level, namespace, _msg, pid, _id);
-
-    return (preventFormattingAgain === true ? 'KITTEN_LOG%' : '') + _out.join(CSV_SEPARATOR) + '\n';
+    return (preventFormattingAgain === true ? 'KT_LOG%' : '') + _out.join(CSV_SEPARATOR) + '\n';
   }
 };
