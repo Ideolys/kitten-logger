@@ -75,7 +75,7 @@ module.exports = {
       _msg = JSON.stringify(msg, null, IS_ATTY === true ? 2 : null);
     }
 
-    let _id = null;
+    let _id = '';
     if (opt && opt.idKittenLogger) {
       _id = opt.idKittenLogger;
     }
@@ -84,17 +84,17 @@ module.exports = {
       _time = getCurrentTimestamp();
       // escape with simple quote, and add quote for CSV.
       // As JSON uses double quote, we use simple quote for CSV to minimize replacements
-      _msg = "'" + _msg.replace(/'/g,"''").replace('\n', '') + "'";
+      _msg = "'" + _msg.replace(/'/g,"''").replace(/\n/g, '') + "'";
     }
     else {
       _time     = COLORS.DIM + getTime() + COLORS.OFF;
       namespace = COLORS.DIM + namespace + COLORS.OFF;
       level     = colorsByLevel[level] + level + COLORS.OFF;
       pid       = COLORS.DIM + pid + COLORS.OFF;
-      _id       = _id ? COLORS.DIM + _id + COLORS.OFF : undefined;
+      _id       = _id ? COLORS.DIM + _id + COLORS.OFF : '';
     }
 
-    _out.push(_time, level, namespace, _msg, pid, _id);
-    return (preventFormattingAgain === true ? 'KT_LOG%' : '') + _out.join(CSV_SEPARATOR) + '\n';
+    _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
+    return (preventFormattingAgain === true ? 'KT_LOG%' : '') + _out + '\n';
   }
 };
