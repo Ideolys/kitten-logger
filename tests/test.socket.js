@@ -154,8 +154,8 @@ describe('socket', () => {
   });
 
   it('should disable DEBUG functions', done => {
-    process.env.KITTEN_LOGGER_LEVEL = 'INFO'
-    let _logger = logger.persistentLogger('sql');
+    process.env.KITTEN_LOGGER_LEVEL = 'INFO';
+    let _logger = logger.persistentLogger('sql-2');
     should(_logger.debug.name).eql('disabled');
 
     socket.listen(c => {
