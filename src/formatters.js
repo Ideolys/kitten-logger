@@ -92,6 +92,7 @@ module.exports = {
       level     = colorsByLevel[level] + level + COLORS.OFF;
       pid       = COLORS.DIM + pid + COLORS.OFF;
       _id       = _id ? COLORS.DIM + _id + COLORS.OFF : '';
+      _mg       = _msg.replace(/\n$/g, '');
     }
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
