@@ -42,8 +42,8 @@ A master process initializes kitten-logger (`kittenLogger.init`) to capture `std
 
 Variable                            | Description
 ------------------------------------|------------
-`KITTEN_LOGGER`                     | Enable namespaces, ex: `namespace:*`. It supports multi-filters with `,` as separator, ex: `namespace,otherNamespace`. By default, the variable searchs `DEBUG` variable. If no `DEBUG`variable has been found, the `*` is set.
-`KITTEN_LOGGER_LEVEL`               | Filter log level from specified level. Default is `DEBUG`. The hierarchy is `DEBUG` < `INFO` < `WARN` < `ERROR`.
+`KITTEN_LOGGER`                     | Enable namespaces, ex: `namespace:*`. It supports multi-filters with `,` as separator, ex: `namespace,otherNamespace`. By default, the variable searchs `DEBUG` variable. If no `DEBUG` variable has been found, the `*` is set.
+`KITTEN_LOGGER_LEVEL`               | Filter log level from specified level. Default is `INFO`. The hierarchy is `DEBUG` < `INFO` < `WARN` < `ERROR`.
 `KITTEN_LOGGER_RETENTION_DAYS`      | Set log retention days. By default is `10`;
 `KITTEN_LOGGER_RETENTION_DIRECTORY` | Directory to write to logs file. Default is `logs`.
 `KITTEN_LOGGER_RETENTION_FILENAME`  | Filename where to write logs. Default is `out`;

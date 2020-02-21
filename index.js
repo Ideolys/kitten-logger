@@ -8,7 +8,7 @@ const formattersCollection = require('./lib/formatters');
 process.env.DEBUG_HIDE_DATE     = true;
 process.env.DEBUG_COLORS        = 0;
 process.env.KITTEN_LOGGER       = process.env.KITTEN_LOGGER || process.env.DEBUG || '*';
-process.env.KITTEN_LOGGER_LEVEL = 'DEBUG';
+process.env.KITTEN_LOGGER_LEVEL = 'INFO';
 
 filter.filter();
 logger.enable();
@@ -32,7 +32,7 @@ module.exports = {
    */
   filterLevel : function (level) {
     if (level) {
-      process.env.KITTEN_LOGGER = level.toUpperCase();
+      process.env.KITTEN_LOGGER_LEVEL = level.toUpperCase();
     }
     logger.enableLevels();
   },
