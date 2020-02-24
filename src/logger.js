@@ -1,5 +1,8 @@
+const tty        = require('tty');
 const formatters = require('./formatters');
 const filter     = require('./filter');
+const IS_ATTY    = tty.isatty(process.stdout.fd);
+const formatFn   = IS_ATTY ? formatters.formatTTY : formatters.format;
 let loggers      = {};
 
 /**
@@ -8,17 +11,17 @@ let loggers      = {};
  * @param {String} namespace
  */
 function defineFns (logger, namespace) {
-  logger.info  = filter.isLevelEnabled('INFO')  ? LOG_LEVEL_FNS.info(logger , namespace) : LOG_LEVEL_FNS.disabled;
-  logger.error = filter.isLevelEnabled('ERROR') ? LOG_LEVEL_FNS.error(logger, namespace) : LOG_LEVEL_FNS.disabled;
-  logger.warn  = filter.isLevelEnabled('WARN')  ? LOG_LEVEL_FNS.warn(logger , namespace) : LOG_LEVEL_FNS.disabled;
-  logger.debug = filter.isLevelEnabled('DEBUG') ? LOG_LEVEL_FNS.debug(logger, namespace) : LOG_LEVEL_FNS.disabled;
+  logger.info  = filter.isLevelEnabled('INFO')  && logger.isEnabled ? LOG_LEVEL_FNS.info(namespace)  : LOG_LEVEL_FNS.disabled;
+  logger.error = filter.isLevelEnabled('ERROR') && logger.isEnabled ? LOG_LEVEL_FNS.error(namespace) : LOG_LEVEL_FNS.disabled;
+  logger.warn  = filter.isLevelEnabled('WARN')  && logger.isEnabled ? LOG_LEVEL_FNS.warn(namespace)  : LOG_LEVEL_FNS.disabled;
+  logger.debug = filter.isLevelEnabled('DEBUG') && logger.isEnabled ? LOG_LEVEL_FNS.debug(namespace) : LOG_LEVEL_FNS.disabled;
 }
 
 const LOG_LEVEL_FNS = {
-  info     : function (logger, namespace, level = 'INFO' ) { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
-  debug    : function (logger, namespace, level = 'DEBUG') { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
-  warn     : function (logger, namespace, level = 'WARN' ) { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
-  error    : function (logger, namespace, level = 'ERROR') { return (msg, opt) => { if (logger.isEnabled === false ) return; process.stdout.write( formatters.format(level, namespace, process.pid, msg, opt, true) )}},
+  info     : function (namespace) { return function info  (msg, opt) { process.stdout.write( formatFn('INFO' , namespace, process.pid, msg, opt, true) )}},
+  debug    : function (namespace) { return function debug (msg, opt) { process.stdout.write( formatFn('DEBUG', namespace, process.pid, msg, opt, true) )}},
+  warn     : function (namespace) { return function warn  (msg, opt) { process.stdout.write( formatFn('WARN' , namespace, process.pid, msg, opt, true) )}},
+  error    : function (namespace) { return function error (msg, opt) { process.stdout.write( formatFn('ERROR', namespace, process.pid, msg, opt, true) )}},
   disabled : function disabled () { return; }
 };
 

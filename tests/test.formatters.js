@@ -4,13 +4,18 @@ const formattersCollection = require('../lib/formatters');
 
 describe('Formatters', () => {
 
+	it('should define two format fns', () => {
+		should(formatters.format).be.a.Function();
+		should(formatters.formatTTY).be.a.Function();
+	})
+
 	it('should separate fields by \t', () => {
 		let msg = formatters.format('DEBUG', 'test', 1, 'Hello world!');
 		should(msg.split('\t').length).above(1);
 	});
 
 	it('should define 7 fields', () => {
-		let msg = formatters.format('DEBUG', 'test', 1268, 'Hello world!');
+		let msg = formatters.formatTTY('DEBUG', 'test', 1268, 'Hello world!');
 		let fields = msg.split('\t');
 		should(fields.length).eql(6);
 		should(/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/.test(fields[0])).eql(true);
