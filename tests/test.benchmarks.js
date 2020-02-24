@@ -1,6 +1,9 @@
 const should       = require('should');
 const kittenLogger = require('../index');
 const fs           = require('fs');
+const pino         = require('pino');
+
+const utils = require('../src/utils');
 
 let writeStream         = fs.createWriteStream('/dev/null');
 let nbIterationsAverage = 10;
@@ -12,6 +15,22 @@ describe('benchmarks', () => {
 
   describe('Persistent logger', () => {
     let persistentLogger = kittenLogger.createPersistentLogger('test');
+
+    it.skip('pino.info("hello world") should be slower than persistentLogger.info("hello world")', () => {
+      redirectOn();
+      let loggerPino   = pino({ timestamp : utils.getTime });
+      let durationPino = average(nbIterationsAverage, () => {
+        for (let i = 0; i < nbIterations; i++) {
+          loggerPino.info('hello world');
+        }
+      });
+      durationKitten = average(nbIterationsAverage, () => {
+        for (let i = 0; i < nbIterations; i++) {
+          persistentLogger.info('hello world');
+        }
+      });
+      should(durationKitten).lessThan(durationPino);
+    });
 
     it('persistentLogger.info("hello world")', () => {
       let duration = average(nbIterationsAverage, () => {
