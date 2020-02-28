@@ -12,6 +12,7 @@ const LOGS_DIRECTORY = process.env.KITTEN_LOGGER_RETENTION_DIRECTORY || 'logs';
 const LOGS_FILE      = process.env.KITTEN_LOGGER_RETENTION_FILENAME  || 'out';
 const outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, LOGS_FILE + '.log');
 const IS_ATTY        = tty.isatty(process.stdout.fd);
+const formatFn       = IS_ATTY ? formatter.formatTTY : formatter.format;
 var currentDay       = '';
 
 let currentRotationIterator = LOG_RETENTION;
@@ -90,7 +91,7 @@ function _getTransform (pid, isWorker) {
     let index      = currentLog.indexOf('KT_LOG%');
 
     if (index === -1) {
-      return callback(null, formatter.format('DEBUG', isWorker ? 'worker' : 'master', pid, currentLog, null, isWorker));
+      return callback(null, formatFn('DEBUG', isWorker ? 'worker' : 'master', pid, currentLog, null, isWorker));
     }
 
     // For workers, sometimes chunk is concatenation of multiple messages
