@@ -44,11 +44,14 @@ describe('logger', () => {
     });
 
     it('should be disabled', () => {
+      let _logger1 = logger.persistentLogger('test');
+
       process.env.KITTEN_LOGGER = 'somethingelse';
       filter.filter();
+      logger.enable();
 
-      let _logger1 = logger.persistentLogger('test');
       should(_logger1.isEnabled).eql(false);
+      should(_logger1.debug.name).eql('disabled');
     });
 
     it('should extend the logger', () => {
