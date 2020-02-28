@@ -93,6 +93,7 @@ function logger (namespace) {
 function enable () {
   for (let namespace in loggers) {
     loggers[namespace].isEnabled = filter.isEnabled(namespace);
+    defineFns(loggers[namespace], namespace);
   }
 }
 
