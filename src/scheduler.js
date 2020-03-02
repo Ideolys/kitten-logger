@@ -2,7 +2,6 @@ const fs        = require('fs');
 const path      = require('path');
 const stream    = require('stream');
 const cluster   = require('cluster');
-const padlz     = require('./utils').padlz;
 const tty       = require('tty');
 const zlib      = require('zlib');
 const formatter = require('./formatters');
@@ -42,7 +41,7 @@ if (!IS_ATTY) {
   // we should do it when there is a new log to write to improve rotation precision
   setInterval(function () {
     var _date = new Date();
-    var _day  = _date.getFullYear() + padlz(_date.getMonth()+1, 2) + padlz(_date.getDate(), 2);
+    var _day  = _date.getFullYear() + '' + _date.getMonth() + '' + _date.getDate();
     if (currentDay === '') {
       currentDay = _day;
     }
