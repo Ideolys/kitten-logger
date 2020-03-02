@@ -72,12 +72,12 @@ else {
 }
 
 // Pipe each worker stdout/stderr to master stdout/stderr
-  cluster.on('fork', function (worker) {
-    const outTransform = createTransformStreamToAddLogInfo(worker.process.pid, true);
-    worker.process.stdout.pipe(outTransform);
-    worker.process.stderr.pipe(outTransform);
-    outTransform.pipe(process.stdout);
-  });
+cluster.on('fork', function (worker) {
+  const outTransform = createTransformStreamToAddLogInfo(worker.process.pid, true);
+  worker.process.stdout.pipe(outTransform);
+  worker.process.stderr.pipe(outTransform);
+  outTransform.pipe(process.stdout);
+});
 
 /**
  * Get transform function

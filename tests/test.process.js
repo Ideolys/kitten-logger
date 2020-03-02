@@ -255,6 +255,21 @@ describe('process', () => {
     });
   });
 
+  it('should log a message in console with no initialization', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_no_init.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, (err, msg) => {
+      let csv = CSVToArray(msg);
+      should(csv.length).eql(2);
+      let log = csv[0];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('INFO');
+      should(log[2]).eql('test-simple');
+      should(log[3]).eql('Test message');
+      should(isNaN(log[4])).eql(false);
+      should(log[5]).eql('');
+      done();
+    });
+  });
+
 });
 
 

@@ -1,3 +1,5 @@
+const cluster = require('cluster');
+
 /**
  * zero padding
  * @param  {String}  n   string
@@ -29,5 +31,9 @@ module.exports = {
       + padlz(_date.getSeconds()     , 2) + '.'
       + padlz(_date.getMilliseconds(), 3)
     ;
+  },
+
+  hasBeenTampered () {
+    return process.stdout.write !== process.stdout.constructor.prototype.write || cluster.isWorker
   }
 };
