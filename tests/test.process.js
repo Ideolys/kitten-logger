@@ -270,6 +270,50 @@ describe('process', () => {
     });
   });
 
+  it('should log a large message', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_large_message.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, (err, msg) => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(3);
+
+
+      let log = csv[0];
+      should(log[3].length).eql(59801);
+
+      log = csv[1];
+      should(log[3]).eql('Test message');
+
+      done();
+    });
+  });
+
+  it('should log a large message in the console', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_large_message_console.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, (err, msg) => {
+      let csv = CSVToArray(msg);
+      should(csv.length).eql(3);
+      let log = csv[0];
+      should(log[3].length).eql(59801);
+
+      log = csv[1];
+      should(log[3]).eql('Test message');
+
+      done();
+    });
+  });
+
+  it('should log large messages from worker in cluster mode', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_cluster_large_message.js')], { cwd : DATASETS_DIRECTORY }, err => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(7);
+      should(csv[2][3].length).eql(59801);
+      should(csv[3][3].length).eql(59801);
+      should(csv[4][3].length).eql(59801);
+      should(csv[5][3].length).eql(59801);
+      done();
+    });
+  });
+
 });
 
 

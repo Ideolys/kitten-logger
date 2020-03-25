@@ -3,6 +3,7 @@ const getTime             = utils.getTime
 const getCurrentTimestamp = utils.getCurrentTimestamp;
 const COLORS              = require('../colors');
 const CSV_SEPARATOR       = '\t';
+const MAX_LENGTH          = 60000;
 
 let formatters = {};
 
@@ -44,7 +45,7 @@ module.exports = {
 
     // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
     if (msg.constructor === String){
-      _msg = msg;
+      _msg = msg.slice(0, MAX_LENGTH);
     }
     else {
       _msg = JSON.stringify(msg);
@@ -83,7 +84,7 @@ module.exports = {
       _msg = formatters[namespace](msg);
     }
     else if (msg.constructor === String){
-      _msg = msg;
+      _msg = msg.slice(0, MAX_LENGTH);
     }
     else {
       _msg = JSON.stringify(msg, null, 2);
