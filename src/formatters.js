@@ -36,9 +36,8 @@ module.exports = {
    * @param {Int} pid
    * @param {Object/String} msg to format/log
    * @param {*} opt option to pass to formatter (ex: req)
-   * @param {Boolean} preventFormattingAgain
    */
-  format (level, namespace, pid, msg, opt, preventFormattingAgain) {
+  format (level, namespace, pid, msg, opt) {
     let _out  = [];
     let _time = '';
     let _msg  = '';
@@ -62,7 +61,7 @@ module.exports = {
     _msg = "'" + _msg.replace(/'/g,"''").replace(/\n/g, '') + "'";
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
-    return (preventFormattingAgain === true && utils.hasBeenTampered() ? 'KT_LOG%' : '') + _out + '\n';
+    return _out + '\n';
   },
 
   /**
@@ -72,9 +71,8 @@ module.exports = {
    * @param {Int} pid
    * @param {Object/String} msg to format/log
    * @param {*} opt option to pass to formatter (ex: req)
-   * @param {Boolean} preventFormattingAgain
    */
-  formatTTY (level, namespace, pid, msg, opt, preventFormattingAgain) {
+  formatTTY (level, namespace, pid, msg, opt) {
     let _out  = [];
     let _time = '';
     let _msg  = '';
@@ -103,6 +101,6 @@ module.exports = {
     _mg       = _msg.replace(/\n$/g, '');
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
-    return (preventFormattingAgain === true && utils.hasBeenTampered() ? 'KT_LOG%' : '') + _out + '\n';
+    return _out + '\n';
   }
 };

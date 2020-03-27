@@ -1,4 +1,5 @@
 const cluster = require('cluster');
+const tty     = require('tty');
 
 /**
  * zero padding
@@ -35,5 +36,7 @@ module.exports = {
 
   hasBeenTampered () {
     return process.stdout.write !== process.stdout.constructor.prototype.write || cluster.isWorker
-  }
+  },
+
+  isTTY : tty.isatty(process.stdout.fd)
 };

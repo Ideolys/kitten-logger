@@ -1,9 +1,10 @@
-const tty        = require('tty');
-const formatters = require('./formatters');
-const filter     = require('./filter');
-const IS_ATTY    = tty.isatty(process.stdout.fd);
-const formatFn   = IS_ATTY ? formatters.formatTTY : formatters.format;
-let loggers      = {};
+const formatters  = require('./formatters');
+const filter      = require('./filter');
+const destination = require('./destination');
+const utils       = require('./utils');
+const formatFn    = utils.IS_ATTY ? formatters.formatTTY : formatters.format;
+let loggers       = {};
+
 
 /**
  * Define logger functions
@@ -18,10 +19,10 @@ function defineFns (logger, namespace) {
 }
 
 const LOG_LEVEL_FNS = {
-  info     : function (namespace) { return function info  (msg, opt) { process.stdout.write( formatFn('INFO' , namespace, process.pid, msg, opt, true) )}},
-  debug    : function (namespace) { return function debug (msg, opt) { process.stdout.write( formatFn('DEBUG', namespace, process.pid, msg, opt, true) )}},
-  warn     : function (namespace) { return function warn  (msg, opt) { process.stdout.write( formatFn('WARN' , namespace, process.pid, msg, opt, true) )}},
-  error    : function (namespace) { return function error (msg, opt) { process.stdout.write( formatFn('ERROR', namespace, process.pid, msg, opt, true) )}},
+  info     : function (namespace) { return function info  (msg, opt) { destination.desWrite( formatFn('INFO' , namespace, process.pid, msg, opt) )}},
+  debug    : function (namespace) { return function debug (msg, opt) { destination.desWrite( formatFn('DEBUG', namespace, process.pid, msg, opt) )}},
+  warn     : function (namespace) { return function warn  (msg, opt) { destination.desWrite( formatFn('WARN' , namespace, process.pid, msg, opt) )}},
+  error    : function (namespace) { return function error (msg, opt) { destination.desWrite( formatFn('ERROR', namespace, process.pid, msg, opt) )}},
   disabled : function disabled () { return; }
 };
 

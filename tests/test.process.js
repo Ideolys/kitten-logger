@@ -7,7 +7,7 @@ const DATASETS_DIRECTORY = path.join(__dirname         , 'datasets');
 const LOGS_DIRECTORY     = path.join(DATASETS_DIRECTORY, 'logs');
 const FILE_PATH          = path.join(LOGS_DIRECTORY    , 'out.log');
 
-describe('process', () => {
+describe.only('process', () => {
 
   beforeEach(done => {
     fs.access(FILE_PATH, err => {

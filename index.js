@@ -1,8 +1,14 @@
+const cluster              = require('cluster');
 const logger               = require('./src/logger');
 const formatters           = require('./src/formatters');
 const filter               = require('./src/filter');
 const socket               = require('./src/socket');
 const formattersCollection = require('./lib/formatters');
+const destination          = require('./src/destination');
+
+if (cluster.isWorker) {
+  destination.setTTY();
+}
 
 // Remove timestamp and color from "debug" package
 process.env.DEBUG_HIDE_DATE     = true;
