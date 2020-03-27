@@ -2,7 +2,7 @@ const formatters  = require('./formatters');
 const filter      = require('./filter');
 const destination = require('./destination');
 const utils       = require('./utils');
-const formatFn    = utils.IS_ATTY ? formatters.formatTTY : formatters.format;
+const formatFn    = utils.isTTY ? formatters.formatTTY : formatters.format;
 let loggers       = {};
 
 
