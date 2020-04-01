@@ -34,13 +34,6 @@ describe('Formatters', () => {
 		should(/\n$/.test(fields[5])).eql(true);
 	});
 
-	it('should define KT_LOG% if preventFormatAgain = true', () => {
-		let msg = formatters.format('DEBUG', 'test', 1268, 'Hello world!', null, true);
-		let fields = msg.split('\t');
-		should(fields.length).eql(6);
-		should(/^KT_LOG%/.test(fields[0])).eql(true);
-	});
-
 	describe('library', () => {
 
 		it('should define formatters', () => {

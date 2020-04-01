@@ -4,12 +4,11 @@ const fs           = require('fs');
 const pino         = require('pino');
 
 const utils = require('../src/utils');
+const dest  = require('../src/destination');
 
 let writeStream         = fs.createWriteStream('/dev/null');
 let nbIterationsAverage = 10;
 let nbIterations        = 10000;
-
-const originalStdoutWrite = process.stdout.write.bind(process.stdout);
 
 describe('benchmarks', () => {
 
@@ -197,11 +196,11 @@ function average (nbIterations, benchFn) {
 }
 
 function redirectOn () {
-  process.stdout.write = writeStream.write.bind(writeStream);
+  dest._setDestination(writeStream.write.bind(writeStream));
 }
 
 function redirectOff () {
-  process.stdout.write = originalStdoutWrite;
+  dest._setDestination(dest.originalWrite);
 }
 
 /**
