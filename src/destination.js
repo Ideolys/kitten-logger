@@ -20,8 +20,6 @@ if (cluster.isWorker) {
   formatFn = formatters.format;
 }
 
-process.stderr.pipe(process.stdout);
-
 module.exports = {
   originalWrite,
   logFilename : outFilename,
@@ -40,6 +38,13 @@ module.exports = {
         callback
       );
     };
+    process.stderr.write = (chunk, encoding, callback) => {
+      destination(
+        formatFn('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
+        encoding,
+        callback
+      );
+    };
   },
 
   setFile () {
@@ -54,6 +59,13 @@ module.exports = {
     process.stdout.write = (chunk, encoding, callback) => {
       destination(
         formatters.format('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
+        encoding,
+        callback
+      );
+    };
+    process.stderr.write = (chunk, encoding, callback) => {
+      destination(
+        formatters.format('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
         encoding,
         callback
       );

@@ -314,6 +314,88 @@ describe('process', () => {
     });
   });
 
+  it('should log error message in log file', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_error.js')], { cwd : DATASETS_DIRECTORY }, err => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(2);
+      let log = csv[0];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('ERROR');
+      should(log[2]).eql('master');
+      should(log[3]).eql('An error');
+      should(isNaN(log[4])).eql(false);
+      should(log[5]).eql('');
+      done();
+    });
+  });
+
+  it('should log error message in log file in cluster', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_error_cluster.js')], { cwd : DATASETS_DIRECTORY }, err => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      let nbMessagesByWorker = {};
+
+      should(csv.length).eql(7);
+      let log = csv[0];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('DEBUG');
+      should(log[2]).eql('master');
+      should(log[3]).eql('Message from master: console.log');
+      should(isNaN(log[4])).eql(false);
+      should(log[5]).eql('');
+      log = csv[1];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('INFO');
+      should(log[2]).eql('test-cluster');
+      should(log[3]).eql('Master done');
+      should(isNaN(log[4])).eql(false);
+      should(log[5]).eql('');
+      log = csv[2];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('ERROR');
+      should(log[2]).eql('worker');
+      should(log[3].slice(0, log[3].indexOf('#'))).eql('An error from worker ');
+      should(isNaN(log[4])).eql(false);
+      should(log[4]).eql(log[3].slice(log[3].indexOf('#') + 1));
+      should(log[5]).eql('');
+      nbMessagesByWorker[log[4]] = !nbMessagesByWorker[log[4]] ? 1 : nbMessagesByWorker[log[4]] + 1;
+      log = csv[3];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('ERROR');
+      should(log[2]).eql('worker');
+      should(log[3].slice(0, log[3].indexOf('#'))).eql('An error from worker ');
+      should(isNaN(log[4])).eql(false);
+      should(log[4]).eql(log[3].slice(log[3].indexOf('#') + 1));
+      should(log[5]).eql('');
+      nbMessagesByWorker[log[4]] = !nbMessagesByWorker[log[4]] ? 1 : nbMessagesByWorker[log[4]] + 1;
+      log = csv[4];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('ERROR');
+      should(log[2]).eql('worker');
+      should(log[3].slice(0, log[3].indexOf('#'))).eql('An error from worker ');
+      should(isNaN(log[4])).eql(false);
+      should(log[4]).eql(log[3].slice(log[3].indexOf('#') + 1));
+      should(log[5]).eql('');
+      nbMessagesByWorker[log[4]] = !nbMessagesByWorker[log[4]] ? 1 : nbMessagesByWorker[log[4]] + 1;
+      log = csv[5];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('ERROR');
+      should(log[2]).eql('worker');
+      should(log[3].slice(0, log[3].indexOf('#'))).eql('An error from worker ');
+      should(isNaN(log[4])).eql(false);
+      should(log[4]).eql(log[3].slice(log[3].indexOf('#') + 1));
+      should(log[5]).eql('');
+      nbMessagesByWorker[log[4]] = !nbMessagesByWorker[log[4]] ? 1 : nbMessagesByWorker[log[4]] + 1;
+
+      for (pid in nbMessagesByWorker) {
+        should(nbMessagesByWorker[pid]).eql(1);
+      }
+      done();
+    });
+  });
+
+
 });
 
 
