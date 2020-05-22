@@ -70,6 +70,14 @@ module.exports = {
         callback
       );
     };
+
+    // If error, try to properly close the current stream and reopen one
+    outLogStream.on('error', () => {
+      this.rotate(() => {
+        this.setFile();
+        this.pushRotationBuffer();
+      });
+    });
   },
 
   /**
