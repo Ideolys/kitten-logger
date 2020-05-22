@@ -1,3 +1,7 @@
+### v0.1.14
+  - Fix: Listen to error event for writable stream.
+  - Fix: When rotating, check if current writable stream is closed.
+
 ### v0.1.13
   - Do not pipe stderr to stdout.
 
