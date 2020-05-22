@@ -83,11 +83,15 @@ module.exports = {
       }
     }
 
-    outLogStream.end();
-    outLogStream.once('error', () => {});
-    outLogStream.once('close', () => {
+    if (outLogStream.writableEnded) {
+      callback();
+    }
+
+    outLogStream.on('error', () => {});
+    outLogStream.on('close', () => {
       callback();
     });
+    outLogStream.end();
   },
 
   /**
