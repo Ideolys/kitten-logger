@@ -14,7 +14,7 @@ if (cluster.isWorker) {
 process.env.DEBUG_HIDE_DATE     = true;
 process.env.DEBUG_COLORS        = 0;
 process.env.KITTEN_LOGGER       = process.env.KITTEN_LOGGER || process.env.DEBUG || '*';
-process.env.KITTEN_LOGGER_LEVEL = 'INFO';
+process.env.KITTEN_LOGGER_LEVEL = process.env.KITTEN_LOGGER_LEVEL || 'INFO';
 
 filter.filter();
 logger.enable();

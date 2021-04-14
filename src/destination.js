@@ -9,9 +9,9 @@ let formatFn        = formatters.formatTTY;
 let destination  = originalWrite;
 let outLogStream = null;
 
-const LOGS_DIRECTORY = process.env.KITTEN_LOGGER_RETENTION_DIRECTORY || 'logs';
-const LOGS_FILE      = process.env.KITTEN_LOGGER_RETENTION_FILENAME  || 'out';
-const outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, LOGS_FILE + '.log');
+let LOGS_DIRECTORY = '';
+let LOGS_FILE      = '';
+let outFilename    = '';
 
 let rotationWritesBuffer  = [];
 let ROTATION_LIMIT_BUFFER = 100000;
@@ -22,7 +22,9 @@ if (cluster.isWorker) {
 
 module.exports = {
   originalWrite,
-  logFilename : outFilename,
+  get logFilename () {
+    return outFilename;
+  },
 
   get desWrite () {
     return destination;
@@ -48,6 +50,10 @@ module.exports = {
   },
 
   setFile () {
+    LOGS_DIRECTORY = process.env.KITTEN_LOGGER_RETENTION_DIRECTORY || 'logs';
+    LOGS_FILE      = process.env.KITTEN_LOGGER_RETENTION_FILENAME  || 'out';
+    outFilename    = path.join(process.cwd(), LOGS_DIRECTORY, LOGS_FILE + '.log');
+
     try {
       fs.mkdirSync(path.join(process.cwd(), LOGS_DIRECTORY));
     }
