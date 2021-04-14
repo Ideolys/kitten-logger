@@ -7,7 +7,7 @@ const utils       = require('./utils');
 const LOG_RETENTION  = process.env.KITTEN_LOGGER_RETENTION_DAYS || 10;
 var currentDay       = '';
 
-let currentRotationIterator = LOG_RETENTION;
+let currentRotationIterator = parseInt(LOG_RETENTION, 10);
 
 // do nothing if this file is called form a worker
 if (cluster.isWorker === true) {

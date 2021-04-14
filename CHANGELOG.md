@@ -1,3 +1,6 @@
+### v0.1.15
+  - Fix: parse env variable `KITTEN_LOGGER_RETENTION_DAYS`
+
 ### v0.1.14
   - Fix: Listen to error event for writable stream.
   - Fix: When rotating, check if current writable stream is closed.
