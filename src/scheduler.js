@@ -4,14 +4,15 @@ const zlib        = require('zlib');
 const destination = require('./destination');
 const utils       = require('./utils');
 
-const LOG_RETENTION  = process.env.KITTEN_LOGGER_RETENTION_DAYS || 10;
-var currentDay       = '';
+let LOG_RETENTION  = 10;
+const envVar       = parseInt(process.env.KITTEN_LOGGER_RETENTION_DAYS, 10);
 
-let currentRotationIterator = parseInt(LOG_RETENTION, 10);
-
-if (isNaN(currentRotationIterator)) {
-  currentRotationIterator = 10;
+if (!isNaN(envVar)) {
+  LOG_RETENTION = envVar;
 }
+
+var currentDay              = '';
+let currentRotationIterator = LOG_RETENTION;
 
 // do nothing if this file is called form a worker
 if (cluster.isWorker === true) {
