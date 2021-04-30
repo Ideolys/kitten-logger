@@ -1,3 +1,6 @@
+### v0.1.16
+  - Fix: ensure that `KITTEN_LOGGER_RETENTION_DAYS` is not a NaN.
+
 ### v0.1.15
   - Fix: parse env variable `KITTEN_LOGGER_RETENTION_DAYS`
 

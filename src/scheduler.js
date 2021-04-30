@@ -9,6 +9,10 @@ var currentDay       = '';
 
 let currentRotationIterator = parseInt(LOG_RETENTION, 10);
 
+if (isNaN(currentRotationIterator)) {
+  currentRotationIterator = 10;
+}
+
 // do nothing if this file is called form a worker
 if (cluster.isWorker === true) {
   return;
