@@ -1,3 +1,6 @@
+### v0.1.17
+ - Fix LOG_RETENTION value in scheduler.
+
 ### v0.1.16
   - Fix: ensure that `KITTEN_LOGGER_RETENTION_DAYS` is not a NaN.
 
