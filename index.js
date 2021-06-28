@@ -5,6 +5,7 @@ const filter               = require('./src/filter');
 const socket               = require('./src/socket');
 const formattersCollection = require('./lib/formatters');
 const destination          = require('./src/destination');
+const variables            = require('./src/variables');
 
 if (cluster.isWorker) {
   destination.setTTY();
@@ -15,6 +16,10 @@ process.env.DEBUG_HIDE_DATE     = true;
 process.env.DEBUG_COLORS        = 0;
 process.env.KITTEN_LOGGER       = process.env.KITTEN_LOGGER || process.env.DEBUG || '*';
 process.env.KITTEN_LOGGER_LEVEL = 'INFO';
+
+if (process.env.KITTEN_LOGGER_IS_LOADED) {
+  variables.isLoggerChild = true;
+}
 
 filter.filter();
 logger.enable();
