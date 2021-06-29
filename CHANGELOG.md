@@ -1,4 +1,4 @@
-## v0.1.x
+## v0.1.18
   - Logs from sub kitten-logger instances were not correctly formatted.
 
 ### v0.1.17
