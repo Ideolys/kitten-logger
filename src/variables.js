@@ -1,3 +1,4 @@
 module.exports = {
-  isLoggerChild : false
+  isLoggerChild : false,
+  isInitialized : false
 };

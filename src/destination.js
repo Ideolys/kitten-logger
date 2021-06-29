@@ -50,8 +50,7 @@ module.exports = {
     destination = originalWrite;
 
     process.stdout.write = (chunk, encoding, callback) => {
-      let resAction = returnIfTag(chunk, encoding, callback);
-      if (resAction) {
+      if (returnIfTag(chunk, encoding, callback)) {
         return;
       }
 
@@ -62,8 +61,7 @@ module.exports = {
       );
     };
     process.stderr.write = (chunk, encoding, callback) => {
-      let resAction = returnIfTag(chunk, encoding, callback);
-      if (resAction) {
+      if (returnIfTag(chunk, encoding, callback)) {
         return;
       }
 
@@ -85,8 +83,7 @@ module.exports = {
     destination  = outLogStream.write.bind(outLogStream);
 
     process.stdout.write = (chunk, encoding, callback) => {
-      let resAction = returnIfTag(chunk, encoding, callback);
-      if (resAction) {
+      if (returnIfTag(chunk, encoding, callback)) {
         return;
       }
 
@@ -97,8 +94,7 @@ module.exports = {
       );
     };
     process.stderr.write = (chunk, encoding, callback) => {
-      let resAction = returnIfTag(chunk, encoding, callback);
-      if (resAction) {
+      if (returnIfTag(chunk, encoding, callback)) {
         return;
       }
 
