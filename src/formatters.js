@@ -63,7 +63,7 @@ module.exports = {
     _msg = "'" + _msg.replace(/'/g,"''").replace(/\n/g, '') + "'";
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
-    return (variables.isLoggerChild ? KITTEN_LOGGER_TAG : '') + _out + '\n';
+    return (variables.isLoggerChild && !variables.isInitialized ? KITTEN_LOGGER_TAG : '') + _out + '\n';
   },
 
   /**
@@ -103,6 +103,6 @@ module.exports = {
     _mg       = _msg.replace(/\n$/g, '');
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
-    return (variables.isLoggerChild ? KITTEN_LOGGER_TAG : '') + _out + '\n';
+    return (variables.isLoggerChild && !variables.isInitialized ? KITTEN_LOGGER_TAG : '') + _out + '\n';
   }
 };
