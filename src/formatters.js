@@ -1,9 +1,11 @@
-const utils               = require('./utils');
-const getTime             = utils.getTime
-const getCurrentTimestamp = utils.getCurrentTimestamp;
-const COLORS              = require('../colors');
-const CSV_SEPARATOR       = '\t';
-const MAX_LENGTH          = 60000;
+const utils                 = require('./utils');
+const getTime               = utils.getTime
+const getCurrentTimestamp   = utils.getCurrentTimestamp;
+const COLORS                = require('../colors');
+const { KITTEN_LOGGER_TAG } = require('./utils');
+const variables             = require('./variables');
+const CSV_SEPARATOR         = '\t';
+const MAX_LENGTH            = 60000;
 
 let formatters = {};
 
@@ -61,7 +63,7 @@ module.exports = {
     _msg = "'" + _msg.replace(/'/g,"''").replace(/\n/g, '') + "'";
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
-    return _out + '\n';
+    return (variables.isLoggerChild ? KITTEN_LOGGER_TAG : '') + _out + '\n';
   },
 
   /**
@@ -101,6 +103,6 @@ module.exports = {
     _mg       = _msg.replace(/\n$/g, '');
 
     _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
-    return _out + '\n';
+    return (variables.isLoggerChild ? KITTEN_LOGGER_TAG : '') + _out + '\n';
   }
 };

@@ -395,6 +395,17 @@ describe('process', () => {
     });
   });
 
+  it('should not log K_LOG', done => {
+    exec('node', [path.join(__dirname, 'datasets', 'process_tag.js')], { cwd : DATASETS_DIRECTORY }, err => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(1);
+      let log = csv[0];
+      should(log.length).eql(1);
+      should(log[0]).eql('test');
+      done();
+    });
+  });
 
 });
 

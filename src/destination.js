@@ -1,7 +1,8 @@
-const fs         = require('fs');
-const path       = require('path');
-const cluster    = require('cluster');
-const formatters = require('./formatters');
+const fs                   = require('fs');
+const path                 = require('path');
+const cluster              = require('cluster');
+const formatters           = require('./formatters');
+const { KITTEN_LOGGER_TAG } = require('./utils');
 
 const originalWrite = process.stdout.write.bind(process.stdout);
 let formatFn        = formatters.formatTTY;
@@ -20,6 +21,23 @@ if (cluster.isWorker) {
   formatFn = formatters.format;
 }
 
+/**
+ * Return msg to destination if Ttag defined
+ * Prevent debug formatting
+ * @param {Bbffer} chunk
+ * @param {String} encoding
+ * @param {Function} callback
+ * @returns {Boolean}
+ */
+function returnIfTag (chunk, encoding, callback) {
+  if (chunk.slice(0, 5) === KITTEN_LOGGER_TAG) {
+    destination(chunk.slice(5), encoding, callback);
+    return true;
+  }
+
+  return false;
+}
+
 module.exports = {
   originalWrite,
   logFilename : outFilename,
@@ -32,6 +50,11 @@ module.exports = {
     destination = originalWrite;
 
     process.stdout.write = (chunk, encoding, callback) => {
+      let resAction = returnIfTag(chunk, encoding, callback);
+      if (resAction) {
+        return;
+      }
+
       destination(
         formatFn('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
         encoding,
@@ -39,6 +62,11 @@ module.exports = {
       );
     };
     process.stderr.write = (chunk, encoding, callback) => {
+      let resAction = returnIfTag(chunk, encoding, callback);
+      if (resAction) {
+        return;
+      }
+
       destination(
         formatFn('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
         encoding,
@@ -57,6 +85,11 @@ module.exports = {
     destination  = outLogStream.write.bind(outLogStream);
 
     process.stdout.write = (chunk, encoding, callback) => {
+      let resAction = returnIfTag(chunk, encoding, callback);
+      if (resAction) {
+        return;
+      }
+
       destination(
         formatters.format('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
         encoding,
@@ -64,6 +97,11 @@ module.exports = {
       );
     };
     process.stderr.write = (chunk, encoding, callback) => {
+      let resAction = returnIfTag(chunk, encoding, callback);
+      if (resAction) {
+        return;
+      }
+
       destination(
         formatters.format('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
         encoding,

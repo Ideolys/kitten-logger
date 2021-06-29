@@ -34,9 +34,7 @@ module.exports = {
     ;
   },
 
-  hasBeenTampered () {
-    return process.stdout.write !== process.stdout.constructor.prototype.write || cluster.isWorker
-  },
+  isTTY : tty.isatty(process.stdout.fd),
 
-  isTTY : tty.isatty(process.stdout.fd)
+  KITTEN_LOGGER_TAG : 'K_LOG'
 };
