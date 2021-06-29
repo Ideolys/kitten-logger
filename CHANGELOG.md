@@ -1,3 +1,6 @@
+## v0.1.19
+  - Fix logs format for master process.
+
 ## v0.1.18
   - Logs from sub kitten-logger instances were not correctly formatted.
 
