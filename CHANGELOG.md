@@ -1,3 +1,6 @@
+## v0.1.x
+  - Logs from sub kitten-logger instances were not correctly formatted.
+
 ### v0.1.17
  - Fix LOG_RETENTION value in scheduler.
 
