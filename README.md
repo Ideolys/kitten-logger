@@ -47,6 +47,7 @@ Variable                            | Description
 `KITTEN_LOGGER_RETENTION_DAYS`      | Set log retention days. By default is `10`;
 `KITTEN_LOGGER_RETENTION_DIRECTORY` | Directory to write to logs file. Default is `logs`.
 `KITTEN_LOGGER_RETENTION_FILENAME`  | Filename where to write logs. Default is `out`;
+`KITTEN_LOGGER_IS_LOADED`           | If `true`, kitten logger will prefix all logs by `K_LOG` for sub instances of kitten-logger.
 
 ### Initialisation `kittenLogger.init`
 
