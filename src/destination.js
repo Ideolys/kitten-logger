@@ -21,6 +21,14 @@ if (cluster.isWorker) {
   formatFn = formatters.format;
 }
 
+/**
+ * Return msg to destination if Ttag defined
+ * Prevent debug formatting
+ * @param {Bbffer} chunk
+ * @param {String} encoding
+ * @param {Function} callback
+ * @returns {Boolean}
+ */
 function returnIfTag (chunk, encoding, callback) {
   if (chunk.slice(0, 5) === KITTEN_LOGGER_TAG) {
     destination(chunk.slice(5), encoding, callback);
