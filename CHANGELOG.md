@@ -1,3 +1,6 @@
+## v0.1.20
+  - Do not truncate logs.
+
 ## v0.1.19
   - Fix logs format for master process.
 

@@ -276,9 +276,9 @@ describe('process', () => {
       let csv      = CSVToArray(fileData.toString());
       should(csv.length).eql(3);
 
-
       let log = csv[0];
-      should(log[3].length).eql(59801);
+      let regex = /DELIMITER/g;
+      should(log[3].match(regex)).be.an.Array().lengthOf(11);
 
       log = csv[1];
       should(log[3]).eql('Test message');
@@ -287,12 +287,14 @@ describe('process', () => {
     });
   });
 
-  it('should log a large message in the console', done => {
-    exec('node', [path.join(__dirname, 'datasets', 'process_large_message_console.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, (err, msg) => {
+  it.skip('should log a large message in the console', done => {
+    spawn('node', [path.join(__dirname, 'datasets', 'process_large_message_console.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, (err, msg) => {
+      console.log(err);
       let csv = CSVToArray(msg);
       should(csv.length).eql(3);
       let log = csv[0];
-      should(log[3].length).eql(59801);
+      let regex = /DELIMITER/g;
+      should(log[3].match(regex)).be.an.Array().lengthOf(11);
 
       log = csv[1];
       should(log[3]).eql('Test message');
@@ -305,11 +307,13 @@ describe('process', () => {
     exec('node', [path.join(__dirname, 'datasets', 'process_cluster_large_message.js')], { cwd : DATASETS_DIRECTORY }, err => {
       let fileData = fs.readFileSync(FILE_PATH);
       let csv      = CSVToArray(fileData.toString());
+      let regex = /DELIMITER/g;
+
       should(csv.length).eql(7);
-      should(csv[2][3].length).eql(59801);
-      should(csv[3][3].length).eql(59801);
-      should(csv[4][3].length).eql(59801);
-      should(csv[5][3].length).eql(59801);
+      should(csv[2][3].match(regex)).be.an.Array().lengthOf(11);
+      should(csv[3][3].match(regex)).be.an.Array().lengthOf(11);
+      should(csv[4][3].match(regex)).be.an.Array().lengthOf(11);
+      should(csv[5][3].match(regex)).be.an.Array().lengthOf(11);
       done();
     });
   });
