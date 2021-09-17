@@ -43,6 +43,10 @@ module.exports = {
     let _time = '';
     let _msg  = '';
 
+    if (msg == null) {
+      msg = '';
+    }
+
     // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
     if (msg.constructor === String){
       _msg = msg;
@@ -77,6 +81,10 @@ module.exports = {
     let _out  = [];
     let _time = '';
     let _msg  = '';
+
+    if (msg == null) {
+      msg = '';
+    }
 
     // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
     if (formatters[namespace] instanceof Function) {
