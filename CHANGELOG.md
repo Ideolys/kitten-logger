@@ -1,3 +1,6 @@
+## v0.1.21
+  - Fix #3: kitten-logger was crashing because of null or undefined messages.
+
 ## v0.1.20
   - Do not truncate logs.
 
