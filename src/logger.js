@@ -19,10 +19,10 @@ function defineFns (logger, namespace) {
 }
 
 const LOG_LEVEL_FNS = {
-  info     : function (namespace) { return function info  (msg, opt) { destination.desWrite( formatFn('INFO' , namespace, process.pid, msg, opt) )}},
-  debug    : function (namespace) { return function debug (msg, opt) { destination.desWrite( formatFn('DEBUG', namespace, process.pid, msg, opt) )}},
-  warn     : function (namespace) { return function warn  (msg, opt) { destination.desWrite( formatFn('WARN' , namespace, process.pid, msg, opt) )}},
-  error    : function (namespace) { return function error (msg, opt) { destination.desWrite( formatFn('ERROR', namespace, process.pid, msg, opt) )}},
+  info     : function (namespace) { return function info  () { destination.desWrite( formatFn('INFO' , namespace, process.pid, arguments) )}},
+  debug    : function (namespace) { return function debug () { destination.desWrite( formatFn('DEBUG', namespace, process.pid, arguments) )}},
+  warn     : function (namespace) { return function warn  () { destination.desWrite( formatFn('WARN' , namespace, process.pid, arguments) )}},
+  error    : function (namespace) { return function error () { destination.desWrite( formatFn('ERROR', namespace, process.pid, arguments) )}},
   disabled : function disabled () { return; }
 };
 

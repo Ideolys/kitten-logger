@@ -55,7 +55,7 @@ module.exports = {
       }
 
       destination(
-        formatFn('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
+        formatFn('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, [chunk.toString()]),
         encoding,
         callback
       );
@@ -66,7 +66,7 @@ module.exports = {
       }
 
       destination(
-        formatFn('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
+        formatFn('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, [chunk.toString()]),
         encoding,
         callback
       );
@@ -88,7 +88,7 @@ module.exports = {
       }
 
       destination(
-        formatters.format('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
+        formatters.format('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, [chunk.toString()]),
         encoding,
         callback
       );
@@ -99,7 +99,7 @@ module.exports = {
       }
 
       destination(
-        formatters.format('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, chunk.toString()),
+        formatters.format('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, [chunk.toString()]),
         encoding,
         callback
       );

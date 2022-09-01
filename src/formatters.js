@@ -15,6 +15,48 @@ const colorsByLevel = {
   ERROR : COLORS.RED
 };
 
+/**
+ * @param {Array} msgOrOptions Array of items to log and/or object of kitten options
+ * @param {Function} formatterFn
+ * @returns {{ id : {String}, msg : {String} }}
+ */
+function parseMsgOrOptions (msgOrOptions, formatterFn) {
+  let id  = '';
+  let msg = [];
+
+  for (let key in msgOrOptions) {
+    let msgOrOption = msgOrOptions[key];
+
+    if (!msgOrOption) {
+      continue;
+    }
+
+    if (msgOrOption.idKittenLogger) {
+      id = msgOrOption.idKittenLogger;
+      continue;
+    }
+
+    if (formatterFn) {
+      msg.push(formatterFn(msgOrOption));
+      continue;
+    }
+
+    if (msgOrOption.constructor === String) {
+      msg.push(msgOrOption);
+      continue;
+    }
+
+    msg.push(JSON.stringify(msgOrOption, null, 2));
+  }
+
+  msg = msg.join(' ');
+
+  return {
+    id,
+    msg
+  };
+}
+
 module.exports = {
 
   /**
@@ -35,37 +77,25 @@ module.exports = {
    * @param {String} level INFO|WARN|ERROR
    * @param {String} namespace
    * @param {Int} pid
-   * @param {Object/String} msg to format/log
-   * @param {*} opt option to pass to formatter (ex: req)
+   * @param {Object/String} msgOrOptions message(s) to format/log, last is option object
    */
-  format (level, namespace, pid, msg, opt) {
+  format (level, namespace, pid, msgOrOptions) {
     let _out  = [];
     let _time = '';
-    let _msg  = '';
+    let _msg  = [];
 
-    if (msg == null) {
-      msg = '';
-    }
-
-    // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
-    if (msg.constructor === String){
-      _msg = msg;
-    }
-    else {
-      _msg = JSON.stringify(msg);
+    if (!msgOrOptions) {
+      msgOrOptions = [];
     }
 
-    let _id = '';
-    if (opt && opt.idKittenLogger) {
-      _id = opt.idKittenLogger;
-    }
+    let { msg, id } = parseMsgOrOptions(msgOrOptions);
 
     _time = getCurrentTimestamp();
     // escape with simple quote, and add quote for CSV.
     // As JSON uses double quote, we use simple quote for CSV to minimize replacements
-    _msg = "'" + _msg.replace(/'/g,"''").replace(/\n/g, '') + "'";
+    _msg = "'" + msg.replace(/'/g,"''").replace(/\n/g, '') + "'";
 
-    _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + _id;
+    _out = _time + CSV_SEPARATOR + level + CSV_SEPARATOR + namespace + CSV_SEPARATOR + _msg + CSV_SEPARATOR + pid + CSV_SEPARATOR + id;
     return (variables.isLoggerChild && !variables.isInitialized ? KITTEN_LOGGER_TAG : '') + _out + '\n';
   },
 
@@ -74,33 +104,17 @@ module.exports = {
    * @param {String} level INFO|WARN|ERROR
    * @param {String} namespace
    * @param {Int} pid
-   * @param {Object/String} msg to format/log
-   * @param {*} opt option to pass to formatter (ex: req)
+   * @param {Array} msgOrOptions message(s) to format/log, last is option object
    */
-  formatTTY (level, namespace, pid, msg, opt) {
+  formatTTY (level, namespace, pid, msgOrOptions) {
     let _out  = [];
     let _time = '';
-    let _msg  = '';
 
-    if (msg == null) {
-      msg = '';
-    }
-
-    // if the output is a terminal and we have a beautifier for this namespace, use it to parse the msg
-    if (formatters[namespace] instanceof Function) {
-      _msg = formatters[namespace](msg);
-    }
-    else if (msg.constructor === String){
-      _msg = msg;
-    }
-    else {
-      _msg = JSON.stringify(msg, null, 2);
+    if (!msgOrOptions) {
+      msgOrOptions = [];
     }
 
-    let _id = '';
-    if (opt && opt.idKittenLogger) {
-      _id = opt.idKittenLogger;
-    }
+    let { msg : _msg, id : _id } = parseMsgOrOptions(msgOrOptions, formatters[namespace]);
 
     _time     = COLORS.DIM + getTime() + COLORS.OFF;
     namespace = COLORS.DIM + namespace + COLORS.OFF;
