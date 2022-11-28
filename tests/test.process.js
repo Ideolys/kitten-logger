@@ -415,14 +415,14 @@ describe('process', () => {
   it('should log where the environnement variable tells to (tty)', done => {
     process.env.KITTEN_LOGGER_DEST = 'tty';
     exec('node', [path.join(__dirname, 'datasets', 'process_simple.js')], { cwd : DATASETS_DIRECTORY }, (err, out) => {
-      let csv      = CSVToArray(out);
+      let csv = CSVToArray(out);
       should(csv.length).eql(2);
       let log = csv[0];
-			should(log.length).eql(6);
-			should(/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/.test(log[0])).eql(true);
-			should(/INFO/.test(log[1])).eql(true);
-			should(/test-simple/.test(log[2])).eql(true);
-			should(log[3]).eql('Test message');
+      should(log.length).eql(6);
+      should(/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/.test(log[0])).eql(true);
+      should(/INFO/.test(log[1])).eql(true);
+      should(/test-simple/.test(log[2])).eql(true);
+      should(log[3]).eql('Test message');
       done();
     });
   });
