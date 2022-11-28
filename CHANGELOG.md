@@ -1,3 +1,7 @@
+## v0.2.2
+*2022-11-28*
+ - Add an env var `KITTEN_LOGGER_DEST` to choose the destination.
+
 ## v0.2.1
 *2022-09-01*
   - Add multi-arguments for format functions. As a result, all format functions (info, error and so on) accept multiple arguments to log, like console.log. Ex: `logger.info('first arg', second arg, nth arg)`.

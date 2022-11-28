@@ -48,6 +48,9 @@ Variable                            | Description
 `KITTEN_LOGGER_RETENTION_DIRECTORY` | Directory to write to logs file. Default is `logs`.
 `KITTEN_LOGGER_RETENTION_FILENAME`  | Filename where to write logs. Default is `out`;
 `KITTEN_LOGGER_IS_LOADED`           | If `true`, kitten-logger will prefix all logs by `K_LOG` for sub instances of kitten-logger.
+`KITTEN_LOGGER_DEST`                | If `auto`, kitten-logger will write logs to the terminal if the process `process.stdout.fd` is a TTY if not, kitten-logger will write logs to the `out.log` file
+                                    | If `tty`, kitten-logger will write logs to the terminal
+                                    | If `file`, kitten-logger will write logs to the `out.log` file
 
 ### Initialisation `kittenLogger.init`
 
