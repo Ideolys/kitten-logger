@@ -1,7 +1,7 @@
-const fs     = require('fs');
-const path   = require('path');
-const should = require('should');
-const exec   = require('child_process').execFile;
+const fs                        = require('fs');
+const path                      = require('path');
+const should                    = require('should');
+const {execFile: exec, spawn}   = require('child_process');
 
 const DATASETS_DIRECTORY = path.join(__dirname         , 'datasets');
 const LOGS_DIRECTORY     = path.join(DATASETS_DIRECTORY, 'logs');
@@ -10,6 +10,7 @@ const FILE_PATH          = path.join(LOGS_DIRECTORY    , 'out.log');
 describe('process', () => {
 
   beforeEach(done => {
+    delete process.env.KITTEN_LOGGER_DEST;
     fs.access(FILE_PATH, err => {
       if (!err) {
         fs.unlinkSync(FILE_PATH);
@@ -411,6 +412,54 @@ describe('process', () => {
     });
   });
 
+  it('should log where the environnement variable tells to (tty)', done => {
+    process.env.KITTEN_LOGGER_DEST = 'tty';
+    exec('node', [path.join(__dirname, 'datasets', 'process_simple.js')], { cwd : DATASETS_DIRECTORY }, (err, out) => {
+      let csv = CSVToArray(out);
+      should(csv.length).eql(2);
+      let log = csv[0];
+      should(log.length).eql(6);
+      should(/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/.test(log[0])).eql(true);
+      should(/INFO/.test(log[1])).eql(true);
+      should(/test-simple/.test(log[2])).eql(true);
+      should(log[3]).eql('Test message');
+      done();
+    });
+  });
+
+  it('should log where the environnement variable tells to (file)', done => {
+    process.env.KITTEN_LOGGER_DEST = 'file';
+    exec('node', [path.join(__dirname, 'datasets', 'process_simple.js')], { cwd : DATASETS_DIRECTORY }, (err, out) => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(2);
+      let log = csv[0];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('INFO');
+      should(log[2]).eql('test-simple');
+      should(log[3]).eql('Test message');
+      should(isNaN(log[4])).eql(false);
+      should(log[5]).eql('');
+      done();
+    });
+  });
+
+  it('should log where the environnement variable tells to (auto)', done => {
+    process.env.KITTEN_LOGGER_DEST = 'auto';
+    exec('node', [path.join(__dirname, 'datasets', 'process_simple.js')], { cwd : DATASETS_DIRECTORY }, (err, out) => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(2);
+      let log = csv[0];
+      should(isNaN((new Date(log[0])).getTime())).eql(false);
+      should(log[1]).eql('INFO');
+      should(log[2]).eql('test-simple');
+      should(log[3]).eql('Test message');
+      should(isNaN(log[4])).eql(false);
+      should(log[5]).eql('');
+      done();
+    });
+  });
 });
 
 

@@ -12,6 +12,10 @@ function padlz (n, len) {
   return n;
 }
 
+function isTTYMode () {
+  return process.env.KITTEN_LOGGER_DEST === 'tty' || (tty.isatty(process.stdout.fd) && (process.env.KITTEN_LOGGER_DEST === 'auto' || !process.env.KITTEN_LOGGER_DEST));
+}
+
 module.exports = {
   getTime () {
     var _date = new Date();
@@ -34,7 +38,7 @@ module.exports = {
     ;
   },
 
-  isTTY : tty.isatty(process.stdout.fd),
+  isTTY : isTTYMode(),
 
   KITTEN_LOGGER_TAG : 'K_LOG'
 };
