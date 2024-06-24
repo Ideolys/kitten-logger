@@ -1,6 +1,14 @@
 const should = require('should');
 const logger = require('../src/logger');
 const filter = require('../src/filter');
+const assert = require('assert');
+
+const diagnosticsChannel = require('diagnostics_channel');
+
+const {
+  DIAGNOSTIC_CHANNEL_NAME,
+  DIAGNOSTIC_SEVERITY
+} = require('../src/utils');
 
 describe('logger', () => {
 
@@ -125,6 +133,95 @@ describe('logger', () => {
       logger.enableLevels();
       should(_logger1.debug.name).not.eql('disabled');
       should(_logger1.info.name).not.eql('disabled');
+    });
+
+  });
+
+  describe('publishDiagnostic', () => {
+
+    it('should publish a diagnostic INFO', done => {
+      function onDiagnostic (message)  {
+        assert.equal(message.severity, DIAGNOSTIC_SEVERITY.INFO);
+        assert.equal(message.properties.pid, process.pid);
+        assert.equal(message.properties.namespace, 'test');
+        assert.equal(message.properties.id, undefined);
+        assert.equal(/test/.test(message.message), true);
+        diagnosticsChannel.unsubscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+        done();
+      }
+
+      diagnosticsChannel.subscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+
+      let _logger = logger.persistentLogger('test');
+      _logger.info('test');
+    });
+
+    it('should publish a diagnostic : DEBUG', done => {
+      function onDiagnostic (message)  {
+        assert.equal(message.severity, DIAGNOSTIC_SEVERITY.DEBUG);
+        assert.equal(message.properties.pid, process.pid);
+        assert.equal(message.properties.namespace, 'test');
+        assert.equal(message.properties.id, undefined);
+        assert.equal(/test/.test(message.message), true);
+        diagnosticsChannel.unsubscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+        done();
+      }
+
+      diagnosticsChannel.subscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+
+      let _logger = logger.persistentLogger('test');
+      _logger.debug('test');
+    });
+
+    it('should publish a diagnostic : WARN', done => {
+      function onDiagnostic (message)  {
+        assert.equal(message.severity, DIAGNOSTIC_SEVERITY.WARN);
+        assert.equal(message.properties.pid, process.pid);
+        assert.equal(message.properties.namespace, 'test');
+        assert.equal(message.properties.id, undefined);
+        assert.equal(/test/.test(message.message), true);
+        diagnosticsChannel.unsubscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+        done();
+      }
+
+      diagnosticsChannel.subscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+
+      let _logger = logger.persistentLogger('test');
+      _logger.warn('test');
+    });
+
+    it('should publish a diagnostic : ERROR', done => {
+      function onDiagnostic (message)  {
+        assert.equal(message.severity, DIAGNOSTIC_SEVERITY.ERROR);
+        assert.equal(message.properties.pid, process.pid);
+        assert.equal(message.properties.namespace, 'test');
+        assert.equal(message.properties.id, undefined);
+        assert.equal(/test/.test(message.message), true);
+        diagnosticsChannel.unsubscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+        done();
+      }
+
+      diagnosticsChannel.subscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+
+      let _logger = logger.persistentLogger('test');
+      _logger.error('test');
+    });
+
+    it('should publish a diagnostic with log id', done => {
+      function onDiagnostic (message)  {
+        assert.equal(message.severity, DIAGNOSTIC_SEVERITY.INFO);
+        assert.equal(message.properties.pid, process.pid);
+        assert.equal(message.properties.namespace, 'test');
+        assert.equal(message.properties.id, 1);
+        assert.equal(/test/.test(message.message), true);
+        diagnosticsChannel.unsubscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+        done();
+      }
+
+      diagnosticsChannel.subscribe(DIAGNOSTIC_CHANNEL_NAME, onDiagnostic);
+
+      let _logger = logger.persistentLogger('test');
+      _logger.info('test', { idKittenLogger : 1 });
     });
 
   });

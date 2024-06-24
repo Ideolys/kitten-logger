@@ -1,5 +1,15 @@
-const cluster = require('cluster');
-const tty     = require('tty');
+const tty                = require('tty');
+const diagnosticsChannel = require('diagnostics_channel');
+
+const DIAGNOSTIC_CHANNEL_NAME = 'kitten-logger';
+const channel                 = diagnosticsChannel.channel(DIAGNOSTIC_CHANNEL_NAME);
+
+const DIAGNOSTIC_SEVERITY = {
+  ERROR : 3,
+  WARN  : 2,
+  INFO  : 1,
+  DEBUG : 0,
+};
 
 /**
  * zero padding
@@ -40,5 +50,33 @@ module.exports = {
 
   isTTY : isTTYMode(),
 
-  KITTEN_LOGGER_TAG : 'K_LOG'
+  KITTEN_LOGGER_TAG : 'K_LOG',
+
+  DIAGNOSTIC_CHANNEL_NAME,
+  DIAGNOSTIC_SEVERITY,
+
+  /**
+   * Publishes a diagnostic message to a diagnostics channel.
+   *
+   * @param {string} level - The logging level (e.g., 'INFO', 'ERROR').
+   * @param {string} namespace - The namespace associated with the message.
+   * @param {number} pid - The process ID from which the message originates.
+   * @param {string} message - The message to be published.
+   */
+  publishDiagnostic(level, namespace, pid, message) {
+    const diagnostic = {
+      severity   : DIAGNOSTIC_SEVERITY[level],
+      message    : message.msg,
+      properties : {
+        namespace,
+        pid,
+      }
+    };
+
+    if (message.id) {
+      diagnostic.properties.id = message.id;
+    }
+
+    channel.publish(diagnostic);
+  }
 };

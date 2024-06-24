@@ -7,10 +7,15 @@ const DATASETS_DIRECTORY = path.join(__dirname         , 'datasets');
 const LOGS_DIRECTORY     = path.join(DATASETS_DIRECTORY, 'logs');
 const FILE_PATH          = path.join(LOGS_DIRECTORY    , 'out.log');
 
+const {
+  DIAGNOSTIC_SEVERITY
+} = require('../src/utils');
+
 describe('process', () => {
 
   beforeEach(done => {
     delete process.env.KITTEN_LOGGER_DEST;
+    delete process.env.KITTEN_LOGGER_LEVEL;
     fs.access(FILE_PATH, err => {
       if (!err) {
         fs.unlinkSync(FILE_PATH);
@@ -290,7 +295,6 @@ describe('process', () => {
 
   it.skip('should log a large message in the console', done => {
     spawn('node', [path.join(__dirname, 'datasets', 'process_large_message_console.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, (err, msg) => {
-      console.log(err);
       let csv = CSVToArray(msg);
       should(csv.length).eql(3);
       let log = csv[0];
@@ -396,6 +400,44 @@ describe('process', () => {
       for (pid in nbMessagesByWorker) {
         should(nbMessagesByWorker[pid]).eql(1);
       }
+      done();
+    });
+  });
+
+  it('should send diagnostic : console debug', done => {
+    process.env.KITTEN_LOGGER_LEVEL = 'DEBUG';
+
+    exec('node', [path.join(__dirname, 'datasets', 'process_console_diagnostic.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, err => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(3);
+      let log = csv[1];
+      const diagnostic = JSON.parse(log[3]);
+
+      should(diagnostic.severity).eql(DIAGNOSTIC_SEVERITY.DEBUG);
+      should(diagnostic.properties.pid).not.eql(process.pid);
+      should(diagnostic.properties.namespace).eql('master');
+      should(diagnostic.properties.id).eql(undefined);
+      should(diagnostic.message).eql('A message from console.log\n');
+      done();
+    });
+  });
+
+  it('should send diagnostic : console error', done => {
+    process.env.KITTEN_LOGGER_LEVEL = 'DEBUG';
+
+    exec('node', [path.join(__dirname, 'datasets', 'process_console_error_diagnostic.js')], { cwd : DATASETS_DIRECTORY, stdio : 'pipe' }, err => {
+      let fileData = fs.readFileSync(FILE_PATH);
+      let csv      = CSVToArray(fileData.toString());
+      should(csv.length).eql(3);
+      let log = csv[1];
+      const diagnostic = JSON.parse(log[3]);
+
+      should(diagnostic.severity).eql(DIAGNOSTIC_SEVERITY.ERROR);
+      should(diagnostic.properties.pid).not.eql(process.pid);
+      should(diagnostic.properties.namespace).eql('master');
+      should(diagnostic.properties.id).eql(undefined);
+      should(diagnostic.message).eql('A message from console.log\n');
       done();
     });
   });

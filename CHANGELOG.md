@@ -1,3 +1,7 @@
+## v0.3.0
+*2024-02-29*
+ - Add support for diagnosticChannel on `kitten-logger`.
+
 ## v0.2.2
 *2022-11-28*
  - Add an env var `KITTEN_LOGGER_DEST` to choose the destination.

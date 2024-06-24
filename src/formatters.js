@@ -58,6 +58,7 @@ function parseMsgOrOptions (msgOrOptions, formatterFn) {
 }
 
 module.exports = {
+  parseMsgOrOptions,
 
   /**
    * Extend formatters list

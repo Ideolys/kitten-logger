@@ -1,8 +1,12 @@
-const fs                   = require('fs');
-const path                 = require('path');
-const cluster              = require('cluster');
-const formatters           = require('./formatters');
-const { KITTEN_LOGGER_TAG } = require('./utils');
+const fs         = require('fs');
+const path       = require('path');
+const cluster    = require('cluster');
+const formatters = require('./formatters');
+const {
+  KITTEN_LOGGER_TAG,
+  publishDiagnostic
+} = require('./utils');
+
 
 const originalWrite = process.stdout.write.bind(process.stdout);
 let formatFn        = formatters.formatTTY;
@@ -87,11 +91,15 @@ module.exports = {
         return;
       }
 
+      const message = chunk.toString();
+
       destination(
-        formatters.format('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, [chunk.toString()]),
+        formatters.format('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, [message]),
         encoding,
         callback
       );
+
+      publishDiagnostic('DEBUG', cluster.isWorker ? 'worker' : 'master', process.pid, formatters.parseMsgOrOptions([message]));
     };
     process.stderr.write = (chunk, encoding, callback) => {
       if (returnIfTag(chunk, encoding, callback)) {
@@ -103,6 +111,8 @@ module.exports = {
         encoding,
         callback
       );
+
+      publishDiagnostic('ERROR', cluster.isWorker ? 'worker' : 'master', process.pid, formatters.parseMsgOrOptions([chunk.toString()]));
     };
 
     // If error, try to properly close the current stream and reopen one

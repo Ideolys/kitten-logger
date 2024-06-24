@@ -1,9 +1,9 @@
-const formatters  = require('./formatters');
-const filter      = require('./filter');
-const destination = require('./destination');
-const utils       = require('./utils');
-const formatFn    = utils.isTTY ? formatters.formatTTY : formatters.format;
-let loggers       = {};
+const formatters         = require('./formatters');
+const filter             = require('./filter');
+const destination        = require('./destination');
+const utils              = require('./utils');
+const formatFn           = utils.isTTY ? formatters.formatTTY : formatters.format;
+let loggers              = {};
 
 
 /**
@@ -19,10 +19,30 @@ function defineFns (logger, namespace) {
 }
 
 const LOG_LEVEL_FNS = {
-  info     : function (namespace) { return function info  () { destination.desWrite( formatFn('INFO' , namespace, process.pid, arguments) )}},
-  debug    : function (namespace) { return function debug () { destination.desWrite( formatFn('DEBUG', namespace, process.pid, arguments) )}},
-  warn     : function (namespace) { return function warn  () { destination.desWrite( formatFn('WARN' , namespace, process.pid, arguments) )}},
-  error    : function (namespace) { return function error () { destination.desWrite( formatFn('ERROR', namespace, process.pid, arguments) )}},
+  info  (namespace) {
+    return function info  () {
+      utils.publishDiagnostic('INFO', namespace, process.pid, formatters.parseMsgOrOptions(arguments));
+      destination.desWrite(formatFn('INFO' , namespace, process.pid, arguments));
+    }
+  },
+  debug (namespace) {
+    return function debug () {
+      utils.publishDiagnostic('DEBUG', namespace, process.pid, formatters.parseMsgOrOptions( arguments));
+      destination.desWrite(formatFn('DEBUG', namespace, process.pid, arguments));
+    }
+  },
+  warn  (namespace) {
+    return function warn  () {
+      utils.publishDiagnostic('WARN', namespace, process.pid, formatters.parseMsgOrOptions( arguments));
+      destination.desWrite(formatFn('WARN' , namespace, process.pid, arguments));
+    }
+  },
+  error (namespace) {
+    return function error () {
+      utils.publishDiagnostic('ERROR', namespace, process.pid, formatters.parseMsgOrOptions( arguments));
+      destination.desWrite(formatFn('ERROR', namespace, process.pid, arguments));
+    }
+  },
   disabled : function disabled () { return; }
 };
 
