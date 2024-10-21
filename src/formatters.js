@@ -117,7 +117,7 @@ module.exports = {
 
     let { msg : _msg, id : _id } = parseMsgOrOptions(msgOrOptions, formatters[namespace]);
 
-    _time     = COLORS.DIM + getTime() + COLORS.OFF;
+    _time     = COLORS.DIM + getCurrentTimestamp() + COLORS.OFF;
     namespace = COLORS.DIM + namespace + COLORS.OFF;
     level     = colorsByLevel[level] + level + COLORS.OFF;
     pid       = COLORS.DIM + pid + COLORS.OFF;
