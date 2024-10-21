@@ -1,3 +1,11 @@
+## v0.3.2
+*xxxx-xx-xx*
+ - Fix logger level from env.
+
+## v0.3.1
+*2024-10-21*
+ - Add timestamp field in log format for TTY output.
+
 ## v0.3.0
 *2024-02-29*
  - Add support for diagnosticChannel on `kitten-logger`.
