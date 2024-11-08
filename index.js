@@ -12,10 +12,10 @@ if (cluster.isWorker) {
 }
 
 // Remove timestamp and color from "debug" package
-process.env.DEBUG_HIDE_DATE     = true;
-process.env.DEBUG_COLORS        = 0;
+process.env.DEBUG_HIDE_DATE     = process.env.DEBUG_HIDE_DATE || true;
+process.env.DEBUG_COLORS        = process.env.DEBUG_COLORS || 0;
 process.env.KITTEN_LOGGER       = process.env.KITTEN_LOGGER || process.env.DEBUG || '*';
-process.env.KITTEN_LOGGER_LEVEL = 'INFO';
+process.env.KITTEN_LOGGER_LEVEL = process.env.KITTEN_LOGGER_LEVEL|| 'INFO';
 
 if (process.env.KITTEN_LOGGER_IS_LOADED) {
   variables.isLoggerChild = true;

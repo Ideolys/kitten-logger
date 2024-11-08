@@ -81,7 +81,7 @@ logger.error(err);
 
 #### `kittenLogger.createLogger({String} namespace) -> {LoggerObject}`
 
-Create a persistent logger. It returns a logger Object.
+Create a simple logger. It returns a logger Object.
 
 Variable        | Description
 ----------------|------------

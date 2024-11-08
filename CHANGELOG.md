@@ -1,3 +1,7 @@
+## v0.3.1
+*xxxx-xx-xx*
+ - Fix logger level from env.
+
 ## v0.3.0
 *2024-02-29*
  - Add support for diagnosticChannel on `kitten-logger`.
