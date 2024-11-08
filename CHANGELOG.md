@@ -1,5 +1,5 @@
 ## v0.3.2
-*xxxx-xx-xx*
+*2024-11-08*
  - Fix logger level from env.
 
 ## v0.3.1
